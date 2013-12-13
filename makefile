@@ -18,6 +18,11 @@ main : $(OBJECTS)
 	$(CC) $(CFLAGS) -c $< -I $(INC_PATH)
 	mv $@ objets/.
 
+test:
+	make grid.o
+	make main.o
+	gcc $(CFLAGS) -o bin/exec objets/*.o -lm
+
 clean : 
 	rm $(OBJ_PATH)/*.o $(BIN_PATH)/main 
 	rm *~ $(INC_PATH)/*~ $(SRC_PATH)/*~

@@ -16,11 +16,11 @@ int min(int a,int b){
 		return a;
 }
 
-int distance(point_t p1,point_t p2){
-	return sqrt((p1->x+p2->x)*(p1->x+p2->x)+(p1->y+p2->y)*(p1->y+p2->y));
+double distance(point_t p1,point_t p2){
+	return sqrt((double)((p1->x+p2->x)*(p1->x+p2->x)+(p1->y+p2->y)*(p1->y+p2->y)));
 }
 
-void setPoint(matrix_t m,int x,int y){
+matrix_t setPoint(matrix_t m,int x,int y){
 	int x_max=m->nb_rows;
 	int y_max=m->nb_columns;
 
@@ -34,7 +34,8 @@ void setPoint(matrix_t m,int x,int y){
 	if(y<0)
 		y=0;
 
-	m->m[x*y_max+y]=1;
+	m->m[x*m->nb_columns+y]=1;
+	return m;
 }
 
 int getPoint(matrix_t m,int x,int y) {
@@ -124,9 +125,10 @@ void create_world(matrix_t m,circle_t circleToDraw){
 void printMat(matrix_t m) {
 	int i;
 	int j;
-	for(i=0;i<m->nb_columns;i++) {
-		for(j=0;j<m->nb_rows;j++) {
-			printf("%c",getPoint(m,i,j));
+	for(i=0;i<m->nb_rows;i++) {
+		for(j=0;j<m->nb_columns;j++) {
+			if(getPoint(m,i,j)==0) printf("%c",'#');
+			else printf("%c",'.');
 		}
 		printf("\n");
 	}
