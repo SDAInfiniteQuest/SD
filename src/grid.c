@@ -119,6 +119,19 @@ void create_world(matrix_t m,circle_t circleToDraw){
 	}
 
 }
+
+
+void printMat(matrix_t m) {
+	int i;
+	int j;
+	for(i=0;i<m->nb_columns;i++) {
+		for(j=0;j<m->nb_rows;j++) {
+			printf("%c",getPoint(m,i,j));
+		}
+		printf("\n");
+	}
+}
+
 /*
 bool test_displacement(displacement_t d,matrix_t m){
 	int startX=d->start.x;
