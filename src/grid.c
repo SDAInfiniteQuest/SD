@@ -1,3 +1,4 @@
+#include "grid.h"
 
 matrix_t init_matrix(int height,int length){
 	matrix_t mat;
@@ -5,6 +6,7 @@ matrix_t init_matrix(int height,int length){
 	mat->m=calloc(height*length,sizeof(char));
 	mat->nb_rows=height;
 	mat->nb_columns=length;
+	return mat;
 }
 
 int min(int a,int b){
@@ -15,12 +17,12 @@ int min(int a,int b){
 }
 
 int distance(point_t p1,point_t p2){
-	return sqrt((p1.x+p2.x)*(p1.x+p2.x)+(p1.y+p2.y)*(p1.y+p2.y));
+	return sqrt((p1->x+p2->x)*(p1->x+p2->x)+(p1->y+p2->y)*(p1->y+p2->y));
 }
 
-void setPoint(matrix_m m,int x,int y){
-	int x_max=m->length;
-	int y_max=m->height;
+void setPoint(matrix_t m,int x,int y){
+	int x_max=m->nb_rows;
+	int y_max=m->nb_columns;
 
 	if(x>x_max)
 		x=x_max;
@@ -32,31 +34,37 @@ void setPoint(matrix_m m,int x,int y){
 	if(y<0)
 		y=0;
 
-	m->mat[x][y]=1;
+	m->m[x*y_max+y]=1;
 }
 
-void circle_in_matrix(matrix_t m, circle_t c){
+int getPoint(matrix_t m,int x,int y) {
+	return m->m[x*m->nb_columns+y];
+}
+
+matrix_t circle_in_matrix(matrix_t m, circle_t c){
 	int x=0,y=c->radius;
-	int m=5-4*c->radius;
-	int x_center=c_>center.x;
-	int y_center=c_>center.y;
+	int midPoint=5-4*y;
+	int x_center=c->center.x;
+	int y_center=c->center.y;
 	while(x<=y){
-		setPoint(m,x+x_centre, y+y_centre ) ;
-		setPoint(m,y+x_centre, x+y_centre ) ;
-		setPoint(m,-x+x_centre, y+y_centre ) ;
-		setPoint(m,-y+x_centre, x+y_centre ) ;
-		setPoint(m,x+x_centre, -y+y_centre ) ;
-		setPoint(m,y+x_centre, -x+y_centre ) ;
-		setPoint(m,-x+x_centre, -y+y_centre ) ;
-		setPoint(m,-y+x_centre, -x+y_centre ) ;
+		setPoint(m,x+x_center, y+y_center ) ;
+		setPoint(m,y+x_center, x+y_center ) ;
+		setPoint(m,-x+x_center, y+y_center ) ;
+		setPoint(m,-y+x_center, x+y_center ) ;
+		setPoint(m,x+x_center, -y+y_center ) ;
+		setPoint(m,y+x_center, -x+y_center ) ;
+		setPoint(m,-x+x_center, -y+y_center ) ;
+		setPoint(m,-y+x_center, -x+y_center ) ;
 		
 		if(m>0){
 			y--;
-			m-=-8*y;
+			midPoint-=-8*y;
 		}
 		x++;
-		m+=8*x+4;
+		midPoint+=8*x+4;
 	}
+
+	return m;
 }
 
 
@@ -64,7 +72,7 @@ void circle_in_matrix(matrix_t m, circle_t c){
 //Allocation de circleToDraw dans create_world
 void create_world(matrix_t m,circle_t circleToDraw){
 	int nb_circle=1+rand()%10;
-	int i=0;
+	int i=0,j=0;
 	circle obs[nb_circle];
 	circle current;
 	int length=m->nb_columns;
@@ -83,7 +91,7 @@ void create_world(matrix_t m,circle_t circleToDraw){
 	while(i<nb_circle){
 		current.center.x=rand()%length;
 		current.center.y=rand()%length;
-		current.radius=1+rand()%(min(lenght,height)/2);
+		current.radius=1+rand()%(min(length,height)/2);
 
 		for (j=0 ; j < i; j++) {
 			if (distance(&current.center,&obs[i].center)<=current.radius+obs[i].radius+15) {
@@ -94,6 +102,7 @@ void create_world(matrix_t m,circle_t circleToDraw){
 			}
 			else if(distance(&current.center,&end)<=current.radius+15){
 				break;
+			}
 			else{
 				obs[i]=(circle)current;
 				i++;
@@ -110,7 +119,7 @@ void create_world(matrix_t m,circle_t circleToDraw){
 	}
 
 }
-
+/*
 bool test_displacement(displacement_t d,matrix_t m){
 	int startX=d->start.x;
 	int startY=d->start.y;
@@ -173,4 +182,4 @@ bool test_ADN(adn_t ind,matrix_t m){
 			return FALSE;
 	}
 	return TRUE;
-}
+}*/
