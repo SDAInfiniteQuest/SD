@@ -66,7 +66,9 @@ void recompute_adn_from_index(adn_t ind,int index){
     compute_displacement(ind->d[index]);
   }
 }
+displacement_t copy_displacement(displacement_t d){
 
+}
 //recalcul tout les deplacement d'un adn
 void recompute_adn(adn_t t){
   int size_adn=ind->nb_displacement;
@@ -94,12 +96,12 @@ void add_displacement(adn_t ind,char dir,int lenght,matrix_t m){
   int nb_displacement=ind->nb_displacement;
 
   if(size-nb_displacement>0){
-    ind->d[nb_displacement]=new;
+    ind->d[nb_displacement]=&new;
     ind->nb_displacement++;
   }
   else{
     ind->d=realloc(ind->d,(size+50)*(sizeof(struct str_displacement)));
-    ind->d[nb_displacement]=new;
+    ind->d[nb_displacement]=&new;
     ind->nb_displacement++;
     ind->size+=50;
   }
@@ -108,7 +110,7 @@ void change_displacement(adn_t ind,int index){
   int starting_point=ind->d[index]->start;
   free(ind->d[index]);
   displacement_t new=create_displacement(starting_point,rand()%8,rand()%30);
-  ind->d[index]=new;
+  ind->d[index]=&new;
   recompute_adn_from_index(ind,index);
 }
 

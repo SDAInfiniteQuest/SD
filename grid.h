@@ -19,6 +19,8 @@ typedef struct str_point {
 
 typedef struct str_matrix{
 	char* m;
+	point start;
+	point end;
 	int nb_rows;
 	int nb_columns;
 }matrix,matrix_t*;

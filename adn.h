@@ -39,7 +39,7 @@ typedef struct str_displacement {
 } displacement,displacement_t*;
 
 typedef struct str_adn {
-	displacement_t* d;
+	displacement* d;
 	int nb_displacement;
 	int size;//nombre de place restante en memoire
 	double path_lenght; //longueur du chemin parcouru 
