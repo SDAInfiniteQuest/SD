@@ -25,6 +25,7 @@
 #include "bool.h"
 #include "grid.h"
 
+#define POPULATION_SIZE 100
 displacement_t create_displacement(point start,char dir,int length);
 void compute_displacement(displacement_t dis,char dir,int length);
 adn_t create_ADN();
@@ -40,7 +41,14 @@ typedef struct str_displacement {
 typedef struct str_adn {
 	displacement_t* d;
 	int nb_displacement;
-	int size;//nombre de place restante en memoire 
+	int size;//nombre de place restante en memoire
+	double path_lenght; //longueur du chemin parcouru 
+	double note; //note apres evalutaion
 }adn, adn_t*;
 
+typedef struct str_population{
+	adn_t* a;
+	int nb_adn;
+	int size;
+}population,population_t*;
 #endif

@@ -61,8 +61,8 @@ void circle_in_matrix(matrix_t m, circle_t c){
 
 
 
-
-void create_world(matrix_t m){
+//Allocation de circleToDraw dans create_world
+void create_world(matrix_t m,circle_t circleToDraw){
 	int nb_circle=1+rand()%10;
 	int i=0;
 	circle obs[nb_circle];
@@ -101,9 +101,14 @@ void create_world(matrix_t m){
 		}
 	}
 
+	circleToDraw=malloc(nb_circle*sizeof(struct str_circle));
+	
+	//#pragma omp parallel for
 	for (i = 0; i < nb_circle; i++) {
 		circle_in_matrix(m,&obs[i]);
+		circleToDraw[i]=obs[i];
 	}
+
 }
 
 bool test_displacement(displacement_t d,matrix_t m){
