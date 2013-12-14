@@ -132,11 +132,12 @@ void printMat(matrix_t m) {
 	}
 }
 
-/*
+
 bool test_displacement(displacement_t d,matrix_t m){
 	int startX=d->start.x;
 	int startY=d->start.y;
 	int length=d-.length;
+  int i;
 
 	if(d->dir==0){
 		for(i=0;i<length;i++){
@@ -190,9 +191,10 @@ bool test_displacement(displacement_t d,matrix_t m){
 }
 
 bool test_ADN(adn_t ind,matrix_t m){
-	for (i = 0; i < ind->nb_displacement; i++) {
+	int i;
+  for (i = 0; i < ind->nb_displacement; i++) {
 		if(!test_displacement(&ind->displace[i],m))
 			return FALSE;
 	}
 	return TRUE;
-}*/
+}

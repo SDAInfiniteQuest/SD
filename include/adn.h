@@ -26,29 +26,41 @@
 #include "grid.h"
 
 #define POPULATION_SIZE 100
-displacement_t create_displacement(point start,char dir,int length);
-void compute_displacement(displacement_t dis,char dir,int length);
-adn_t create_ADN();
 
-bool add_displacement(adn_t ind,char dir,int lenght,matrix_t m){
+typedef struct str_point {
+	int x;
+	int y;
+} point,*point_t;
+
 typedef struct str_displacement {
 	point start;
 	point end;
 	char dir;
 	int length;
-} displacement,displacement_t*;
+} displacement,*displacement_t;
 
 typedef struct str_adn {
-	displacement* d;
+	displacement_t* d;
 	int nb_displacement;
 	int size;//nombre de place restante en memoire
 	double path_lenght; //longueur du chemin parcouru 
 	double note; //note apres evalutaion
-}adn, adn_t*;
+}adn,*adn_t;
 
 typedef struct str_population{
 	adn_t* a;
 	int nb_adn;
 	int size;
-}population,population_t*;
+}population,*population_t;
+
+displacement_t create_displacement(point start,char dir,int length);
+void compute_displacement(displacement_t dis,char dir,int length);
+void recompute_adn_from_index(adn_t ind,int index);
+void recompute_adn(adn_t t);
+void add_displacement(adn_t ind,char dir,int lenght);
+void change_displacement(adn_t ind,int index);
+population_t create_population();
+bool population_add(adn_t ind,population_t pop);
+adn_t create_ADN();
+
 #endif

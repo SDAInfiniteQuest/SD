@@ -8,14 +8,22 @@ OBJ_PATH = objets
 BIN_PATH = bin
 VPATH = src:include:objets:bin
 
-all : main
+all : main server client
 
-main : $(OBJECTS) 
+server:server.o include.h
+	gcc $(OBJECT) -o $@ $(OBJ_PATH)/server.o
+	mv $@ bin/.
+	
+client:client.o include.h
+	gcc $(OBJECT) -o $@ $(OBJ_PATH)/client.o
+	mv $@ bin/.
+
+main : maintest.o adn.o grid.o genetic.o
 	gcc $(CFLAGS) -o $@ $(OBJECTS_DIR)
 	mv $@ bin/.
 
 %.o : %.c
-	$(CC) $(CFLAGS) -c $< -I $(INC_PATH)
+	$(CC) $(CFLAGS) -c $< -I$(INC_PATH)
 	mv $@ objets/.
 
 clean : 
