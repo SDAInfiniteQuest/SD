@@ -60,7 +60,7 @@ void compute_displacement(displacement_t dis,char dir,int length){
 void recompute_adn_from_index(adn_t ind,int index){
   int size_adn=ind->nb_displacement;
   int i;
-
+  
   for (i = index; i < size_adn; i++) {
     ind->d[index]->start=ind->d[index-1]->end;
     compute_displacement(ind->d[index],ind->d[index]->dir,ind->d[index]->length);
@@ -77,7 +77,7 @@ void recompute_adn(adn_t ind){
 }
 adn_t create_ADN(){
   adn_t new=malloc(sizeof(struct str_adn));
-  new->d=malloc(sizeof(struct str_displacement)*100);
+  new->d=malloc(sizeof(displacement_t)*100);
   point start;
   start.x=0;
   start.y=0;
@@ -87,21 +87,26 @@ adn_t create_ADN(){
   new->nb_displacement=1;
   return new;
 }
-
-void add_displacement(adn_t ind,char dir,int length){
+//On ne peut pas avoir un deplacement qui sort du jeu
+bool add_displacement(adn_t ind,char dir,int length){
   displacement_t new=create_displacement(ind->d[ind->nb_displacement-1]->end,dir,length);
   int size=ind->size;
   int nb_displacement=ind->nb_displacement;
+  
+  if(new->end.x<0 ||new->end.y<0)
+    return FALSE;
 
   if(size-nb_displacement>0){
     ind->d[nb_displacement]=new;
     ind->nb_displacement++;
+    return TRUE;
   }
   else{
     ind->d=realloc(ind->d,(size+50)*(sizeof(struct str_displacement)));
     ind->d[nb_displacement]=new;
     ind->nb_displacement++;
     ind->size+=50;
+    return TRUE;
   }
 }
 void change_displacement(adn_t ind,int index){
@@ -113,11 +118,11 @@ void change_displacement(adn_t ind,int index){
 }
 
 
-population_t create_population(){
+population_t create_population(int size){
   population_t new=malloc(sizeof(struct str_population));
-  new->a=malloc(sizeof(struct str_adn)*POPULATION_SIZE);
+  new->a=malloc(sizeof(adn_t)*size);
   new->nb_adn=0;
-  new->size=POPULATION_SIZE;
+  new->size=size;
   
   return new;
 }
@@ -134,4 +139,10 @@ bool population_add(adn_t ind,population_t pop){
   return FALSE;
 }
 
+void init_population(population_t pop){
+  int i;
 
+  for (i = 0; i < POPULATION_SIZE; i++) {
+    population_add(create_ADN(),pop);
+  }
+}

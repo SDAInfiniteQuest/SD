@@ -54,10 +54,11 @@ displacement_t create_displacement(point start,char dir,int length);
 void compute_displacement(displacement_t dis,char dir,int length);
 void recompute_adn_from_index(adn_t ind,int index);
 void recompute_adn(adn_t t);
-void add_displacement(adn_t ind,char dir,int lenght);
+bool add_displacement(adn_t ind,char dir,int lenght);
 void change_displacement(adn_t ind,int index);
-population_t create_population();
+population_t create_population(int size);
 bool population_add(adn_t ind,population_t pop);
 adn_t create_ADN();
+void init_population(population_t pop);
 
 #endif

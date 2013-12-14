@@ -6,11 +6,17 @@ void quicksort_population(population_t old,population_t new,population_t selecte
 
   //#pragma omp parallel for
   for (i = 0; i < POPULATION_SIZE; i++) {
-    selected->a[i]=old->a[i];
-    selected->a[i+POPULATION_SIZE]=new->a[i];
+    //selected->a[i]=old->a[i];
+    //selected->a[i+POPULATION_SIZE]=new->a[i];
+    population_add(old->a[i],selected);
+  }
+  for (i = 0; i < POPULATION_SIZE; i++) {
+    //selected->a[i]=old->a[i];
+    //selected->a[i+POPULATION_SIZE]=new->a[i];
+    population_add(new->a[i],selected);
   }
 
-  quicksort(selected,0,POPULATION_SIZE*2);
+  quicksort(selected,0,POPULATION_SIZE*2-1);
 
 }
 

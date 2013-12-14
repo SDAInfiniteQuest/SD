@@ -1,8 +1,16 @@
 #include "genetic.h"
 
 void growth(adn_t a){
+  while(!add_displacement(a,rand()%8,rand()%30)){}
 }
 
+void growth_population(population_t pop){
+  int i;
+  for (i = 0; i < pop->nb_adn; i++) {
+    growth(pop->a[i]);
+  }
+
+}
 bool test_displacement(displacement_t d,matrix_t m){
 	int startX=d->start.x;
 	int startY=d->start.y;
@@ -112,7 +120,7 @@ void crossing_from_population(population_t old,population_t new){
   int index_random2;
   int i;
   for (i = 0; i < POPULATION_SIZE; i++) {
-    population_add(crossing_over(old->a[i],old->a[POPULATION_SIZE-i]),new);
+    population_add(crossing_over(old->a[i],old->a[(POPULATION_SIZE-1)-i]),new);
   }
 
   while(cont){
@@ -126,7 +134,7 @@ void crossing_from_population(population_t old,population_t new){
 }
 
 void evaluation(adn_t ind,matrix_t m){
-  point last_position=ind->d[ind->nb_displacement]->end;
+  point last_position=ind->d[ind->nb_displacement-1]->end;
   point end=m->end;
   double eval=0;
   //Ne rencontre pas d'obstacle 
@@ -162,11 +170,11 @@ void selection(population_t old,population_t new,matrix_t m){
     evaluation(old->b[i]);
   }
   */
-  //quicksort_population(old,new,selected);
+  quicksort_population(old,new,selected);
   
   //old contient maintenant tout les bon individu
   for(i=0;i<POPULATION_SIZE;i++)
-    old->a[i]=selected->a[POPULATION_SIZE*2-i];
+    old->a[i]=selected->a[(POPULATION_SIZE*2-1)-i];
 
   //free tout les individu "mauvais", la moitie restante de selected
   /*
@@ -178,11 +186,11 @@ void selection(population_t old,population_t new,matrix_t m){
 
 //mutation aleatoire de l'ordre de 1%
 void mutate_adn(adn_t ind){
-  int size_adn=ind->size;
+  int nb_displacement=ind->nb_displacement;
   double mut_chance;
   int i; 
   //#pragma omp parallel for
-  for (i = 0; i < size_adn; i++) {
+  for (i = 1; i < nb_displacement; i++) {
     mut_chance=rand()%100;
     if (mut_chance<1) {
       change_displacement(ind,i);

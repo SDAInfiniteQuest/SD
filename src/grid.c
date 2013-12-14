@@ -6,7 +6,8 @@ matrix_t init_matrix(int height,int length){
 	mat->m=calloc(height*length,sizeof(char));
 	mat->nb_rows=height;
 	mat->nb_columns=length;
-	return mat;
+	
+  return mat;
 }
 
 int min(int a,int b){
@@ -57,7 +58,7 @@ matrix_t circle_in_matrix(matrix_t m, circle_t c){
 		setPoint(m,-x+x_center, -y+y_center ) ;
 		setPoint(m,-y+x_center, -x+y_center ) ;
 		
-		if(m>0){
+		if(midPoint>0){
 			y--;
 			midPoint-=-8*y;
 		}
@@ -89,13 +90,15 @@ void create_world(matrix_t m,circle_t circleToDraw){
 	start.x=length;
 	start.y=height/2;
 	
-	while(i<nb_circle){
+  matrix_t tmp=m;
+	
+  while(i<nb_circle){
 		current.center.x=rand()%length;
 		current.center.y=rand()%length;
 		current.radius=1+rand()%(min(length,height)/2);
 
-		for (j=0 ; j < i; j++) {
-			if (distance(&current.center,&obs[i].center)<=current.radius+obs[i].radius+15) {
+		for (j=0 ; j <= i; j++) {
+			if (distance(&current.center,&obs[j].center)<=current.radius+obs[j].radius+15) {
 				break;
 			}
 			else if(distance(&current.center,&start)<=current.radius+15){
@@ -105,17 +108,16 @@ void create_world(matrix_t m,circle_t circleToDraw){
 				break;
 			}
 			else{
-				obs[i]=(circle)current;
+				obs[i]=current;
 				i++;
 			}
 		}
 	}
-
 	circleToDraw=malloc(nb_circle*sizeof(struct str_circle));
 	
 	//#pragma omp parallel for
 	for (i = 0; i < nb_circle; i++) {
-		circle_in_matrix(m,&obs[i]);
+		circle_in_matrix(tmp,&obs[i]);
 		circleToDraw[i]=obs[i];
 	}
 

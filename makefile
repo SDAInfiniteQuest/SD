@@ -1,4 +1,4 @@
-CFLAGS = -Wall -g
+CFLAGS = -Wall -g -O0
 #OBJECTS = $(patsubst src/%.c, %.o, $(wildcard src/*.c))
 #OBJECTS_DIR = $(patsubst src/%.c, objets/%.o, $(wildcard src/*.c))
 CC = gcc
@@ -18,8 +18,8 @@ client: client.o
 	gcc $(OBJECT) -o $@ $(OBJ_PATH)/client.o -lm
 	mv $@ bin/.
 
-main :maintest.o adn.o grid.o genetic.o 
-	gcc $(CFLAGS) -o $@ $(OBJ_PATH)/adn.o $(OBJ_PATH)/grid.o $(OBJ_PATH)/genetic.o $(OBJ_PATH)/maintest.o -lm
+main :maintest.o adn.o grid.o genetic.o quicksort.o 
+	gcc $(CFLAGS) -o $@ $(OBJ_PATH)/adn.o $(OBJ_PATH)/grid.o $(OBJ_PATH)/quicksort.o $(OBJ_PATH)/genetic.o $(OBJ_PATH)/maintest.o -lm
 	mv $@ bin/.
 
 maintest.o: maintest.c adn.h genetic.h
@@ -35,6 +35,10 @@ genetic.o: genetic.c genetic.h adn.h grid.h
 	mv $@ objets/.
 
 grid.o: grid.c grid.h
+	$(CC) $(CFLAGS)  -c $< -I $(INC_PATH) -o $@
+	mv $@ objets/.
+
+quicksort.o: quicksort.c quicksort.h
 	$(CC) $(CFLAGS)  -c $< -I $(INC_PATH) -o $@
 	mv $@ objets/.
 
