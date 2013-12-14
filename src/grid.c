@@ -138,54 +138,55 @@ void printMat(matrix_t m) {
 bool test_displacement(displacement_t d,matrix_t m){
 	int startX=d->start.x;
 	int startY=d->start.y;
-	int length=d-.length;
+	int length=d->length;
+  int dir=d->dir;
   int i;
 
-	if(d->dir==0){
+	if(dir==0){
 		for(i=0;i<length;i++){
-			if(m->[startX][startY+i]==1)
+			if(getPoint(m,startX,startY+i)==1)
 				return FALSE;
 		}
 	}
-	else if(d_>dir==1){
+	else if(dir==1){
 		for(i=0;i<length;i++){
-			if(m->[startX+i][startY+i]==1)
+			if(getPoint(m,startX+i,startY+i)==1)
 				return FALSE;
 		}
 	}
-	else if(d_>dir==2){
+	else if(dir==2){
 		for(i=0;i<length;i++){
-			if(m->[startX+i][startY]==1)
+			if(getPoint(m,startX+i,startY)==1)
 				return FALSE;
 		}
 	}
-	else if(d_>dir==3){
+	else if(dir==3){
 		for(i=0;i<length;i++){
-			if(m->[startX+i][startY-i]==1)
+			if(getPoint(m,startX+i,startY-i)==1)
 				return FALSE;
 		}
 	}
-	else if(d_>dir==4){
+	else if(dir==4){
 		for(i=0;i<length;i++){
-			if(m->[startX][startY-i]==1)
+			if(getPoint(m,startX,startY-i)==1)
 				return FALSE;
 		}
 	}
-	else if(d_>dir==5){
+	else if(dir==5){
 		for(i=0;i<length;i++){
-			if(m->[startX-i][startY-i]==1)
+			if(getPoint(m,startX-i,startY-i)==1)
 				return FALSE;
 		}
 	}
-	else if(d_>dir==6){
+	else if(dir==6){
 		for(i=0;i<length;i++){
-			if(m->[startX-i][startY]==1)
+			if(getPoint(m,startX-i,startY)==1)
 				return FALSE;
 		}
 	}
-	else if(d_>dir==7){
+	else if(dir==7){
 		for(i=0;i<length;i++){
-			if(m->[startX-i][startY+i]==1)
+			if(getPoint(m,startX-i,startY+i)==1)
 				return FALSE;
 		}
 	}
@@ -195,7 +196,7 @@ bool test_displacement(displacement_t d,matrix_t m){
 bool test_ADN(adn_t ind,matrix_t m){
 	int i;
   for (i = 0; i < ind->nb_displacement; i++) {
-		if(!test_displacement(&ind->displace[i],m))
+		if(!test_displacement(ind->d[i],m))
 			return FALSE;
 	}
 	return TRUE;
