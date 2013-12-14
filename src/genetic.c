@@ -1,5 +1,73 @@
 #include "genetic.h"
+
 void growth(adn_t a){
+}
+
+bool test_displacement(displacement_t d,matrix_t m){
+	int startX=d->start.x;
+	int startY=d->start.y;
+	int length=d->length;
+  int dir=d->dir;
+  int i;
+
+	if(dir==0){
+		for(i=0;i<length;i++){
+			if(getPoint(m,startX,startY+i)==1)
+				return FALSE;
+		}
+	}
+	else if(dir==1){
+		for(i=0;i<length;i++){
+			if(getPoint(m,startX+i,startY+i)==1)
+				return FALSE;
+		}
+	}
+	else if(dir==2){
+		for(i=0;i<length;i++){
+			if(getPoint(m,startX+i,startY)==1)
+				return FALSE;
+		}
+	}
+	else if(dir==3){
+		for(i=0;i<length;i++){
+			if(getPoint(m,startX+i,startY-i)==1)
+				return FALSE;
+		}
+	}
+	else if(dir==4){
+		for(i=0;i<length;i++){
+			if(getPoint(m,startX,startY-i)==1)
+				return FALSE;
+		}
+	}
+	else if(dir==5){
+		for(i=0;i<length;i++){
+			if(getPoint(m,startX-i,startY-i)==1)
+				return FALSE;
+		}
+	}
+	else if(dir==6){
+		for(i=0;i<length;i++){
+			if(getPoint(m,startX-i,startY)==1)
+				return FALSE;
+		}
+	}
+	else if(dir==7){
+		for(i=0;i<length;i++){
+			if(getPoint(m,startX-i,startY+i)==1)
+				return FALSE;
+		}
+	}
+	return TRUE;
+}
+
+bool test_ADN(adn_t ind,matrix_t m){
+	int i;
+  for (i = 0; i < ind->nb_displacement; i++) {
+		if(!test_displacement(ind->d[i],m))
+			return FALSE;
+	}
+	return TRUE;
 }
 
 //Enjambement a 70%
@@ -94,16 +162,18 @@ void selection(population_t old,population_t new,matrix_t m){
     evaluation(old->b[i]);
   }
   */
-  quicksort_population(old,new,selected);
+  //quicksort_population(old,new,selected);
   
   //old contient maintenant tout les bon individu
   for(i=0;i<POPULATION_SIZE;i++)
     old->a[i]=selected->a[POPULATION_SIZE*2-i];
 
   //free tout les individu "mauvais", la moitie restante de selected
+  /*
   for (i = 1; i <= POPULATION_SIZE; i++) {
     free_adn(selected->a[POPULATION_SIZE-i]);
   }
+  */
 }
 
 //mutation aleatoire de l'ordre de 1%

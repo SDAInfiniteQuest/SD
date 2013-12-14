@@ -27,10 +27,7 @@
 
 #define POPULATION_SIZE 100
 
-typedef struct str_point {
-	int x;
-	int y;
-} point,*point_t;
+
 
 typedef struct str_displacement {
 	point start;
