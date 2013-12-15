@@ -1,15 +1,17 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 #include "adn.h"
 #include "genetic.h"
 #include "display.h"
 
 
 int main(int argc, char* argv[]){
-	Uint16 i=50;
-	Uint16 j=50;
-	circle_t cir;
-	matrix_t m=init_matrix(1000,600);
+	srand(time(NULL));
+	Uint16 i=0;
+	Uint16 j=0;
+	circle_t cir=NULL;
+	matrix_t m=init_matrix(800,800);
 	create_world(m,cir);
 	SDL_Surface *screen;
 
@@ -18,7 +20,7 @@ int main(int argc, char* argv[]){
 		exit(EXIT_FAILURE);
 	}
 
-	if((screen=SDL_SetVideoMode(m->nb_rows,m->nb_columns,32,SDL_DOUBLEBUF | SDL_HWSURFACE))==NULL) {
+	if((screen=SDL_SetVideoMode(m->nb_columns,m->nb_rows,32,SDL_ANYFORMAT | SDL_DOUBLEBUF | SDL_HWSURFACE))==NULL) {
 		fprintf(stderr, "erreur SDL %s\n", SDL_GetError());
 		exit(EXIT_FAILURE);
 	}

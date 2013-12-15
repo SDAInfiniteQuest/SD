@@ -18,23 +18,24 @@ void pause() {
 		}
 	}
 }
-/*
-void putpixel(SDL_Surface* screen, int x, int y)
+
+/*void putpixel(SDL_Surface* screen, Uint16 x, Uint16 y)
 {
 	Uint32 *pixel = (Uint32*)screen->pixels;
-	Uint32 *p = pixel + y*screen->pitch/4 + x;
+	Uint32 *p = pixel + y*screen->pitch + x;
 	*p = SDL_MapRGB(screen->format, 0x99, 0x99,0x99);
 }*/
 
+
 void putpixel(SDL_Surface * surface, Uint16 x, Uint16 y, Uint32 color)
 {
-	/* Nombre de bits par pixels de la surface d'écran */
+	// Nombre de bits par pixels de la surface d'écran 
 	Uint8 bpp = surface->format->BytesPerPixel;
-	/* Pointeur vers le pixel à remplacer (pitch correspond à la
-	 * taille 
-	 *        d'une ligne d'écran, c'est à dire (longueur *
-	 *        bitsParPixel) 
-	 *               pour la plupart des cas) */
+	// Pointeur vers le pixel à remplacer (pitch correspond à la
+	//  taille 
+	//        d'une ligne d'écran, c'est à dire (longueur *
+	//        bitsParPixel) 
+	//               pour la plupart des cas) 
 	Uint8 * p = ((Uint8 *)surface->pixels) + y * surface->pitch + x * bpp;
 	switch(bpp)
 	{
