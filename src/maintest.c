@@ -6,8 +6,8 @@
 
 
 int main(int argc, char* argv[]){
-	int i=50;
-	int j=50;
+	Uint16 i=50;
+	Uint16 j=50;
 	circle_t cir;
 	matrix_t m=init_matrix(1000,600);
 	create_world(m,cir);
@@ -18,7 +18,7 @@ int main(int argc, char* argv[]){
 		exit(EXIT_FAILURE);
 	}
 
-	if((screen=SDL_SetVideoMode(m->nb_rows,m->nb_columns,8,SDL_DOUBLEBUF | SDL_HWSURFACE))==NULL) {
+	if((screen=SDL_SetVideoMode(m->nb_rows,m->nb_columns,32,SDL_DOUBLEBUF | SDL_HWSURFACE))==NULL) {
 		fprintf(stderr, "erreur SDL %s\n", SDL_GetError());
 		exit(EXIT_FAILURE);
 	}
@@ -27,7 +27,7 @@ int main(int argc, char* argv[]){
 
 	for(i=0;i<m->nb_rows;i++)  
 		for(j=0;j<m->nb_columns;j++)  
-			if(getPoint(m,i,j)==1) putpixel(screen,i,j);  
+			if(getPoint(m,i,j)==1) putpixel(screen,i,j,0xffffff);  
 
 	//printMat(m);
 
