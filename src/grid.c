@@ -87,9 +87,10 @@ void create_world(matrix_t m,circle_t circleToDraw){
   start.y=height/2;
 
   //a randomiser par la suite
-  start.x=length;
-  start.y=height/2;
-
+  end.x=length;
+  end.y=height/2;
+  m->end=end;
+  m->start=start;
   matrix_t tmp=m;
 
   while(i<nb_circle){
@@ -126,7 +127,7 @@ void create_world(matrix_t m,circle_t circleToDraw){
     circle_in_matrix(tmp,&obs[i]);
     circleToDraw[i]=obs[i];
   }
-
+  printf("Trouve un monde\n");
 }
 
 

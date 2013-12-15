@@ -60,5 +60,5 @@ population_t create_population(int size);
 bool population_add(adn_t ind,population_t pop);
 adn_t create_ADN();
 void init_population(population_t pop);
-
+void flush_population(population_t pop);
 #endif

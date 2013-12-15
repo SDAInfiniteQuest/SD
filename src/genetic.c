@@ -9,7 +9,6 @@ void growth_population(population_t pop){
   for (i = 0; i < pop->nb_adn; i++) {
     growth(pop->a[i]);
   }
-
 }
 bool test_displacement(displacement_t d,matrix_t m){
 	int startX=d->start.x;
@@ -17,8 +16,15 @@ bool test_displacement(displacement_t d,matrix_t m){
 	int length=d->length;
   int dir=d->dir;
   int i;
+ 
+  //Si le deplacement sort du jeu
+  if(d->end.x<0 || d->end.y<0)
+    return FALSE;
 
-	if(dir==0){
+  if(d->start.x<0 || d->start.y<0)
+    return FALSE;
+	
+  if(dir==0){
 		for(i=0;i<length;i++){
 			if(getPoint(m,startX,startY+i)==1)
 				return FALSE;
@@ -78,7 +84,7 @@ bool test_ADN(adn_t ind,matrix_t m){
 	return TRUE;
 }
 
-//Enjambement a 70%
+//Enjambement a 30%
 adn_t crossing_over(adn_t A,adn_t B){
   int size_A=A->nb_displacement;
   int size_B=B->nb_displacement;
@@ -91,9 +97,10 @@ adn_t crossing_over(adn_t A,adn_t B){
   if(min(size_A,size_B)==size_A){
     for (i = 0; i < size_A; i++) {
       chance_cross=rand()%101;
-      add_displacement(C,B->d[i]->dir,B->d[i]->length);
-      if(chance_cross<=70)
+      if(chance_cross<=30)
         add_displacement(C,A->d[i]->dir,A->d[i]->length);
+      else
+        add_displacement(C,B->d[i]->dir,B->d[i]->length);
     }
     for(;i<size_B;i++){
       add_displacement(C,B->d[i]->dir,B->d[i]->length);
@@ -102,9 +109,10 @@ adn_t crossing_over(adn_t A,adn_t B){
   else{ 
     for (i = 0; i < size_B; i++) {
       chance_cross=rand()%101;
-      add_displacement(C,A->d[i]->dir,A->d[i]->length);
-      if(chance_cross<=70)
+      if(chance_cross<=30)
         add_displacement(C,B->d[i]->dir,B->d[i]->length);
+      else
+        add_displacement(C,A->d[i]->dir,A->d[i]->length);
     }
     for(;i<size_A;i++){
       add_displacement(C,A->d[i]->dir,A->d[i]->length);
@@ -119,6 +127,9 @@ void crossing_from_population(population_t old,population_t new){
   int index_random1;
   int index_random2;
   int i;
+
+  flush_population(new);
+  printf("%d\n",new->nb_adn);
   for (i = 0; i < POPULATION_SIZE; i++) {
     population_add(crossing_over(old->a[i],old->a[(POPULATION_SIZE-1)-i]),new);
   }
@@ -137,11 +148,13 @@ void evaluation(adn_t ind,matrix_t m){
   point last_position=ind->d[ind->nb_displacement-1]->end;
   point end=m->end;
   double eval=0;
-  //Ne rencontre pas d'obstacle 
+  //Ne rencontre pas d'obstacle ou ne sort pas du jeu 
   if(test_ADN(ind,m))
     eval+=100;
   else
     eval-=100;
+  
+  
 
   //distance par rapport a l'arrivee
   if(last_position.x==m->end.x && last_position.y==m->end.y)
@@ -210,9 +223,12 @@ void genetic(matrix_t m,population_t old,population_t new ){
   evaluate_population(old,m);
   evaluate_population(new,m);
   
+  //met tous les bon dans old 
   selection(old,new,m);
+  //le resultat des crossing des adn de old vont dans new
   crossing_from_population(old,new);
   
   mutate_population(new);  
+  growth_population(new);
 
 }

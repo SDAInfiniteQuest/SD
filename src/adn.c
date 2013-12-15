@@ -67,6 +67,10 @@ void recompute_adn_from_index(adn_t ind,int index){
   }
 }
 
+void flush_population(population_t pop){
+  pop->nb_adn=0;
+}
+
 //recalcul tout les deplacement d'un adn
 void recompute_adn(adn_t ind){
   //int size_adn=ind->nb_displacement;
