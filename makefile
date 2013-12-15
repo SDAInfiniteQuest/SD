@@ -2,6 +2,8 @@ CFLAGS = -Wall -g -O0
 #OBJECTS = $(patsubst src/%.c, %.o, $(wildcard src/*.c))
 #OBJECTS_DIR = $(patsubst src/%.c, objets/%.o, $(wildcard src/*.c))
 CC = gcc
+LIB=-lm -lSDL
+LIB_PATH=/usr/lib/SDL
 INC_PATH = include
 SRC_PATH = src
 OBJ_PATH = objets
@@ -18,12 +20,12 @@ client: client.o
 	gcc $(OBJECT) -o $@ $(OBJ_PATH)/client.o -lm
 	mv $@ bin/.
 
-main :maintest.o adn.o grid.o genetic.o quicksort.o 
-	gcc $(CFLAGS) -o $@ $(OBJ_PATH)/adn.o $(OBJ_PATH)/grid.o $(OBJ_PATH)/quicksort.o $(OBJ_PATH)/genetic.o $(OBJ_PATH)/maintest.o -lm
+main :maintest.o adn.o grid.o genetic.o quicksort.o display.o 
+	gcc $(CFLAGS) -o $@ $(OBJ_PATH)/adn.o $(OBJ_PATH)/grid.o $(OBJ_PATH)/display.o $(OBJ_PATH)/quicksort.o $(OBJ_PATH)/genetic.o $(OBJ_PATH)/maintest.o  $(LIB)
 	mv $@ bin/.
 
-maintest.o: maintest.c adn.h genetic.h
-	$(CC) $(CFLAGS)  -c $< -I $(INC_PATH) -o $@
+maintest.o: maintest.c adn.h genetic.h display.h
+	$(CC) $(CFLAGS)  -c $< -I $(INC_PATH) -o $@ -I $(LIB_PATH) $(LIB)
 	mv $@ objets/.
 
 adn.o: adn.c adn.h 
@@ -49,6 +51,11 @@ server.o: server.c include.h
 client.o: client.c include.h
 	$(CC) $(CFLAGS)  -c $< -I $(INC_PATH) -o $@
 	mv $@ objets/.
+
+display.o: display.c display.h
+	$(CC) $(CFLAGS)  -c $< -I $(INC_PATH) -o $@ $(LIB)
+	mv $@ objets/.
+
 
 #%.o : %.c
 #	$(CC) $(CFLAGS) -o $@ -c $< -I $(INC_PATH)
