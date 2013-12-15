@@ -97,36 +97,29 @@ void create_world(matrix_t m,circle_t circleToDraw){
 		current.center.x=rand()%length;
 		current.center.y=rand()%height;
 		current.radius=3+rand()%(min(length,height)/40);
+
+		if((distance(&current.center,&start)<=current.radius+15) || (distance(&current.center,&end)<=current.radius+15)) 
+			not_possible=TRUE;
+
 		if(i>0)
 		{
 			for (j=0 ; j <= i; j++) {
-				if (distance(&current.center,&obs[j].center)<=(double)(current.radius+obs[j].radius+15)) {
+	      if (distance(&current.center,&obs[j].center)<=current.radius+obs[j].radius+15) {
 					not_possible=TRUE;
-				}
-				else if(distance(&current.center,&start)<=current.radius+15){
-					not_possible=TRUE;
-				}
-				else if(distance(&current.center,&end)<=current.radius+15){
-					not_possible=TRUE;
+					break;
 				}
 			}
 		}
 
 		if (not_possible==FALSE) {
 			obs[i]=current;
-		circle_in_matrix(tmp,&obs[i]);
-		circleToDraw[i]=obs[i];
+			circle_in_matrix(tmp,&obs[i]);
+			circleToDraw[i]=obs[i];
 		}
 		i++;
 
 		not_possible=FALSE;
 	}
-
-
-	//#pragma omp parallel for
-	for (i = 0; i < nb_circle; i++) {
-	}
-
 }
 
 
