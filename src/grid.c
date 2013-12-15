@@ -73,7 +73,7 @@ matrix_t circle_in_matrix(matrix_t m, circle_t c){
 
 //Allocation de circleToDraw dans create_world
 void create_world(matrix_t m,circle_t circleToDraw){
-	int nb_circle=1+rand()%10;
+	int nb_circle=10000;
 	int i=0,j=0;
 	circle obs[nb_circle];
 	circle current;
@@ -91,42 +91,40 @@ void create_world(matrix_t m,circle_t circleToDraw){
 	end.y=height/2;
 
 	matrix_t tmp=m;
+	circleToDraw=malloc(nb_circle*sizeof(struct str_circle));
 
 	while(i<nb_circle){
 		current.center.x=rand()%length;
 		current.center.y=rand()%height;
-		current.radius=1+rand()%(min(length,height)/8);
-		if(i>0) {
+		current.radius=3+rand()%(min(length,height)/40);
+		if(i>0)
+		{
 			for (j=0 ; j <= i; j++) {
 				if (distance(&current.center,&obs[j].center)<=(double)(current.radius+obs[j].radius+15)) {
 					not_possible=TRUE;
-					break;
 				}
 				else if(distance(&current.center,&start)<=current.radius+15){
 					not_possible=TRUE;
-					break;
 				}
 				else if(distance(&current.center,&end)<=current.radius+15){
 					not_possible=TRUE;
-					break;
 				}
 			}
 		}
 
 		if (not_possible==FALSE) {
 			obs[i]=current;
-			i++;
+		circle_in_matrix(tmp,&obs[i]);
+		circleToDraw[i]=obs[i];
 		}
+		i++;
 
 		not_possible=FALSE;
-
 	}
-	circleToDraw=malloc(nb_circle*sizeof(struct str_circle));
+
 
 	//#pragma omp parallel for
 	for (i = 0; i < nb_circle; i++) {
-		circle_in_matrix(tmp,&obs[i]);
-		circleToDraw[i]=obs[i];
 	}
 
 }

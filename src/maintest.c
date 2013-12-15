@@ -27,11 +27,9 @@ int main(int argc, char* argv[]){
 
   SDL_WM_SetCaption("World and best path", NULL);
 
-	for(i=0;i<m->nb_rows;i++)  
-		for(j=0;j<m->nb_columns;j++)  
-			if(getPoint(m,i,j)==1) putpixel(screen,i,j,0xffffff);  
-
-	//printMat(m);
+	for(i=1;i<m->nb_rows;i++)  
+		for(j=1;j<m->nb_columns;j++)  
+			if(getPoint(m,i,j)==0) putpixel(screen,i,j,0xffffff);
 
 	SDL_Flip(screen);
 	pause();
