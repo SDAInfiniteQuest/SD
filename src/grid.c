@@ -22,8 +22,8 @@ double distance(point_t p1,point_t p2){
 }
 
 matrix_t setPoint(matrix_t m,int x,int y){
-  int x_max=m->nb_rows;
-  int y_max=m->nb_columns;
+  int x_max=m->nb_columns;
+  int y_max=m->nb_rows;
 
   if(x>x_max)
     x=x_max;
@@ -35,12 +35,12 @@ matrix_t setPoint(matrix_t m,int x,int y){
   if(y<0)
     y=0;
 
-  m->m[x*m->nb_columns+y]=1;
+  m->m[y*m->nb_columns+x]=1;
   return m;
 }
 
 int getPoint(matrix_t m,int x,int y) {
-  return m->m[x*m->nb_columns+y];
+  return m->m[y*m->nb_columns+x];
 }
 
 matrix_t circle_in_matrix(matrix_t m, circle_t c){
@@ -87,8 +87,8 @@ void create_world(matrix_t m,circle_t circleToDraw){
   start.y=height/2;
 
   //a randomiser par la suite
-  start.x=length;
-  start.y=height/2;
+  end.x=length;
+  end.y=height/2;
 
   matrix_t tmp=m;
 
@@ -135,8 +135,8 @@ void printMat(matrix_t m) {
   int j;
   for(i=0;i<m->nb_rows;i++) {
     for(j=0;j<m->nb_columns;j++) {
-      if(getPoint(m,i,j)==0) printf("%c",'#');
-      else printf("%c",'.');
+      if(getPoint(m,i,j)!=0) printf("(%d,%d,%c)",i,j,getPoint(m,i,j));
+      //else printf("%c",'.');
     }
     printf("\n");
   }

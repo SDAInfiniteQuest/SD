@@ -9,7 +9,7 @@ int main(int argc, char* argv[]){
 	int i=50;
 	int j=50;
 	circle_t cir;
-	matrix_t m=init_matrix(600,1000);
+	matrix_t m=init_matrix(1000,600);
 	create_world(m,cir);
 	SDL_Surface *screen;
 
@@ -18,17 +18,18 @@ int main(int argc, char* argv[]){
 		exit(EXIT_FAILURE);
 	}
 
-	if((screen=SDL_SetVideoMode(m->nb_columns,m->nb_rows,8,SDL_DOUBLEBUF | SDL_HWSURFACE))==NULL) {
+	if((screen=SDL_SetVideoMode(m->nb_rows,m->nb_columns,8,SDL_DOUBLEBUF | SDL_HWSURFACE))==NULL) {
 		fprintf(stderr, "erreur SDL %s\n", SDL_GetError());
 		exit(EXIT_FAILURE);
 	}
 
   SDL_WM_SetCaption("World and best path", NULL);
 
-	while(i<m->nb_columns) { 
-		while(j<m->nb_rows) { if(getPoint(m,i,j)!=0) putpixel(screen,i,j); j++; } 
-		i++; 
-	}
+	for(i=0;i<m->nb_rows;i++)  
+		for(j=0;j<m->nb_columns;j++)  
+			if(getPoint(m,i,j)==1) putpixel(screen,i,j);  
+
+	//printMat(m);
 
 	SDL_Flip(screen);
 	pause();
