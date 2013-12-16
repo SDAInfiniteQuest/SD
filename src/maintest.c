@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 #include "adn.h"
 #include "genetic.h"
 #include <time.h>
@@ -7,10 +8,11 @@
 
 
 int main(int argc, char* argv[]){
-	int i=50;
-	int j=50;
-	circle_t cir;
-	matrix_t m=init_matrix(600,1000);
+	srand(time(NULL));
+	Uint16 i=0;
+	Uint16 j=0;
+	circle_t cir=NULL;
+	matrix_t m=init_matrix(800,800);
 	create_world(m,cir);
 	SDL_Surface *screen;
 
@@ -19,17 +21,16 @@ int main(int argc, char* argv[]){
 		exit(EXIT_FAILURE);
 	}
 
-	if((screen=SDL_SetVideoMode(m->nb_columns,m->nb_rows,8,SDL_DOUBLEBUF | SDL_HWSURFACE))==NULL) {
+	if((screen=SDL_SetVideoMode(m->nb_columns,m->nb_rows,32,SDL_ANYFORMAT | SDL_DOUBLEBUF | SDL_HWSURFACE))==NULL) {
 		fprintf(stderr, "erreur SDL %s\n", SDL_GetError());
 		exit(EXIT_FAILURE);
 	}
 
   SDL_WM_SetCaption("World and best path", NULL);
 
-	while(i<m->nb_columns) { 
-		while(j<m->nb_rows) { if(getPoint(m,i,j)!=0) putpixel(screen,i,j); j++; } 
-		i++; 
-	}
+	for(i=1;i<m->nb_rows;i++)  
+		for(j=1;j<m->nb_columns;j++)  
+			if(getPoint(m,i,j)==0) putpixel(screen,i,j,0xffffff);
 
 	SDL_Flip(screen);
 	pause();
