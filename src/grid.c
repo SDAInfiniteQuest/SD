@@ -89,6 +89,9 @@ void create_world(matrix_t m,circle_t circleToDraw){
 	//a randomiser par la suite
 	end.x=length;
 	end.y=height/2;
+  
+  m->end=end;
+  m->start=start;
 
 	matrix_t tmp=m;
 	circleToDraw=malloc(nb_circle*sizeof(struct str_circle));

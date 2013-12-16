@@ -188,7 +188,7 @@ void evaluation(adn_t ind,matrix_t m){
   else
     eval+=100-sqrt((end.x-last_position.x)*(end.x-last_position.x)+(end.y-last_position.y)*(end.y-last_position.y));
   //Gestion de la longueur du chemin
-  eval/=ind->length;
+  eval/=ind->path_length+1;
   ind->note=eval;
 }
 void evaluate_population(population_t pop,matrix_t m){

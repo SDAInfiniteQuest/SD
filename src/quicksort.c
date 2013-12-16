@@ -32,7 +32,7 @@ void quicksort(population_t tab,int debut,int fin){
   int i;
 
   if(debut<fin){
-    int pivot=tab->a[fin]->note;
+    float pivot=tab->a[fin]->note;
     int elementAechanger=debut;
 
     for(i=debut;i<fin;i++){

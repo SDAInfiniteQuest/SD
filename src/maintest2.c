@@ -27,7 +27,7 @@ int main(int argc, char* argv[]){
     growth_population(new);
   }
   
-  for (i = 0; i < 30; i++) {
+  for (i = 0; i < 1000; i++) {
     genetic(mat,old,new);
   }
  

@@ -40,7 +40,7 @@ typedef struct str_adn {
 	displacement_t* d;
 	int nb_displacement;
 	int size;//nombre de place restante en memoire
-	double path_lenght; //longueur du chemin parcouru 
+	double path_length; //longueur du chemin parcouru 
 	double note; //note apres evalutaion
 }adn,*adn_t;
 

@@ -86,7 +86,7 @@ adn_t create_ADN(){
   start.x=0;
   start.y=0;
   new->d[0]=create_displacement(start,0,0);
-  new->length=0;
+  new->path_length=0;
   new->size=100;
   new->nb_displacement=1;
   return new;
@@ -99,8 +99,8 @@ bool add_displacement(adn_t ind,char dir,int length){
   
   //if(new->end.x<0 ||new->end.y<0)
   //  return FALSE;
-  
-  ind->length+=length;
+   
+  ind->path_length+=length;
   if(size-nb_displacement>0){
     ind->d[nb_displacement]=new;
     ind->nb_displacement++;
