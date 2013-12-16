@@ -103,7 +103,7 @@ void create_world(matrix_t m,circle_t circleToDraw){
 
 		if(i>0)
 		{
-			for (j=0 ; j <= i; j++) {
+			for (j=0 ; j <= i && not_possible==FALSE; j++) {
 	      if (distance(&current.center,&obs[j].center)<=current.radius+obs[j].radius+15) {
 					not_possible=TRUE;
 					break;
