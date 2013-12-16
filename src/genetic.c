@@ -1,7 +1,7 @@
 #include "genetic.h"
 
 void growth(adn_t a){
-  while(!add_displacement(a,rand()%8,rand()%30)){}
+  while(!add_displacement(a,rand()%8,1+rand()%20)){}
 }
 
 void growth_population(population_t pop){
@@ -156,7 +156,7 @@ void crossing_from_population(population_t old,population_t new){
 
   flush_population(new);
   printf("%d\n",new->nb_adn);
-  for (i = 0; i < POPULATION_SIZE; i++) {
+  for (i = 0; i < POPULATION_SIZE-1; i++) {
     population_add(crossing_over(old->a[i],old->a[(POPULATION_SIZE-1)-i]),new);
   }
 
@@ -188,7 +188,8 @@ void evaluation(adn_t ind,matrix_t m){
   else
     eval+=100-sqrt((end.x-last_position.x)*(end.x-last_position.x)+(end.y-last_position.y)*(end.y-last_position.y));
   //Gestion de la longueur du chemin
-  eval/=ind->path_length+1;
+    eval-=ind->path_length;
+
   ind->note=eval;
 }
 void evaluate_population(population_t pop,matrix_t m){
@@ -238,7 +239,7 @@ void mutate_adn(adn_t ind){
   //#pragma omp parallel for
   for (i = 1; i < nb_displacement; i++) {
     mut_chance=rand()%100;
-    if (mut_chance<1) {
+    if (mut_chance<threshold) {
       change_displacement(ind,i);
     }
   }
