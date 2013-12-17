@@ -61,4 +61,9 @@ bool population_add(adn_t ind,population_t pop);
 adn_t create_ADN();
 void init_population(population_t pop);
 
+
+void freeDna(adn_t a); 
+void freeDisplacement(displacement_t d);
+void freePopulation(population_t p);
+
 #endif

@@ -75,6 +75,7 @@ void recompute_adn(adn_t ind){
   //skip le debut
   recompute_adn_from_index(ind,1);
 }
+
 adn_t create_ADN(){
   adn_t new=malloc(sizeof(struct str_adn));
   new->d=malloc(sizeof(displacement_t)*100);
@@ -87,6 +88,7 @@ adn_t create_ADN(){
   new->nb_displacement=1;
   return new;
 }
+
 //On ne peut pas avoir un deplacement qui sort du jeu
 //Renvoit TRUE si déplacement correct et FALSE sinon
 bool add_displacement(adn_t ind,char dir,int length){
@@ -94,8 +96,10 @@ bool add_displacement(adn_t ind,char dir,int length){
   int size=ind->size;
   int nb_displacement=ind->nb_displacement;
   
-  if(new->end.x<0 ||new->end.y<0 ||new->end.x>GRID_SIZE || new->end.y>GRID_SIZE)
+  if(new->end.x<0 ||new->end.y<0 ||new->end.x>GRID_SIZE || new->end.y>GRID_SIZE){
+		freeDisplacement(new);
     return FALSE;
+	}
 
   if(size-nb_displacement>0){
     ind->d[nb_displacement]=new;
@@ -110,6 +114,7 @@ bool add_displacement(adn_t ind,char dir,int length){
     return TRUE;
   }
 }
+
 void change_displacement(adn_t ind,int index){
   point starting_point=ind->d[index]->start;
   free(ind->d[index]);
@@ -146,4 +151,26 @@ void init_population(population_t pop){
   for (i = 0; i < POPULATION_SIZE; i++) {
     population_add(create_ADN(),pop);
   }
+}
+
+void freeDisplacement(displacement_t d) {
+	free(d);
+}
+
+void freeDna(adn_t a) {
+	int i;
+	for (i = 0; i < a->nb_displacement; i++) {
+		freeDisplacement(a->d[i]);
+	}
+	free(a->d);
+	free(a);
+}
+
+void freePopulation(population_t p) {
+	int i;
+	for (i = 0; i < p->nb_adn; i++) {
+		freeDna(p->a[i]);
+	}
+	free(p->a);
+	free(p);
 }
