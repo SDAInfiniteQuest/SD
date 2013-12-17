@@ -11,16 +11,12 @@ int main(int argc, char* argv[]){
 	int i;
 	circle_t cir=NULL;
 	adn_t a=create_ADN();
-	matrix_t m=init_matrix(840,840);
+	matrix_t m=init_matrix(GRID_SIZE,GRID_SIZE);
 	create_world(m,cir);
 	SDL_Surface *screen;
 
-	for (i = 1; i < 100; i++) {
-		add_displacement(a,(char)(rand()%8), rand()%30);
-		//d=create_displacement(a->d[i-1]->end, (char)(rand())%8, rand()%30));
-		//d->nb_displacement++;
-	}
-
+	for (i = 1; i < 100;) 
+		if(add_displacement(a,(char)(rand()%8), rand()%100)==TRUE) i++;
 
 	if(SDL_Init(SDL_INIT_VIDEO) == -1) {
 		fprintf(stderr, "impossible de lancer la sdl: %s\n",SDL_GetError());

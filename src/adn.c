@@ -88,12 +88,13 @@ adn_t create_ADN(){
   return new;
 }
 //On ne peut pas avoir un deplacement qui sort du jeu
+//Renvoit TRUE si déplacement correct et FALSE sinon
 bool add_displacement(adn_t ind,char dir,int length){
   displacement_t new=create_displacement(ind->d[ind->nb_displacement-1]->end,dir,length);
   int size=ind->size;
   int nb_displacement=ind->nb_displacement;
   
-  if(new->end.x<0 ||new->end.y<0)
+  if(new->end.x<0 ||new->end.y<0 ||new->end.x>GRID_SIZE || new->end.y>GRID_SIZE)
     return FALSE;
 
   if(size-nb_displacement>0){

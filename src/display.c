@@ -24,6 +24,7 @@ void pause() {
 
 
 void putpixel(SDL_Surface * surface, Uint16 x, Uint16 y, Uint32 color){
+	//printf("entree putpixel\n");
 	// Nombre de bits par pixels de la surface d'écran 
 	Uint8 bpp = surface->format->BytesPerPixel;
 	// Pointeur vers le pixel à remplacer (pitch correspond à la
@@ -53,6 +54,7 @@ void putpixel(SDL_Surface * surface, Uint16 x, Uint16 y, Uint32 color){
 			*(Uint32 *)p = color;
 			break;
 	}
+	//printf("sortie putpixel\n");
 }
 
 void displayWorld (SDL_Surface *screen, matrix_t m) {
@@ -63,42 +65,43 @@ void displayWorld (SDL_Surface *screen, matrix_t m) {
 }
 
 void displayDisplacement (SDL_Surface *screen, displacement_t d) {
-	printf("entree déplacment\n");
+	static Uint32 color=0x0033ff;
 
 	int i;
 	char mv=d->dir;
 	int abs=d->start.x;
 	int ord=d->start.y;
 	for (i = 0; i < d->length; i++) {
-		printf("deplacement n°%d\n",i);
+				printf("(%d,%d,%d,%d)\n",abs,ord,i,mv);
 		switch(mv) {
 			case 0:
-				putpixel(screen, abs, ord+i, 0x0033ff);
+				putpixel(screen, abs, ord+i, color);
 				break;
 			case 1:
-				putpixel(screen, abs+i, ord+i, 0x0033ff);
+				putpixel(screen, abs+i, ord+i, color);
 				break;
 			case 2:
-				putpixel(screen, abs+i, ord, 0x0033ff);
+				putpixel(screen, abs+i, ord, color);
 				break;
 			case 3:
-				putpixel(screen, abs+i, ord-i, 0x0033ff);
+				putpixel(screen, abs+i, ord-i, color);
 				break;
 			case 4:
-				putpixel(screen, abs, ord-i, 0x0033ff);
+				putpixel(screen, abs, ord-i, color);
 				break;
 			case 5:
-				putpixel(screen, abs-i, ord-i, 0x0033ff);
+				putpixel(screen, abs-i, ord-i, color);
 				break;
 			case 6:
-				putpixel(screen, abs-i, ord, 0x0033ff);
+				putpixel(screen, abs-i, ord, color);
 				break;
 			case 7:
-				putpixel(screen, abs-i, ord+i, 0x0033ff);
+				putpixel(screen, abs-i, ord+i, color);
 				break;
 		}
 	}
-	printf("sortie déplacment\n");
+	if(color>0x0) color-=10;
+	//printf("%d\n",color);
 }
 
 void displayDna (SDL_Surface *screen, adn_t a) {
