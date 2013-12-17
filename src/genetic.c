@@ -95,9 +95,7 @@ adn_t crossing_over(adn_t A,adn_t B){
 
   C=create_ADN();
   if (A->note>B->note){
-    if (A->note>0) {
-      threshold+=A->note/3;
-    }
+    threshold-=A->note/3;
     for (i = 1; i < size_A; i++) {
       chance_cross=rand()%101;
       if(chance_cross<=threshold)
@@ -107,9 +105,7 @@ adn_t crossing_over(adn_t A,adn_t B){
     }
   }
   else{
-    if (B->note>0) {
-      threshold+=B->note/3;
-    }
+    threshold-=B->note/3;
     for (i = 1; i < size_B; i++) {
       chance_cross=rand()%101;
       if(chance_cross<=threshold)
@@ -188,7 +184,7 @@ void evaluation(adn_t ind,matrix_t m){
   else
     eval+=100-sqrt((end.x-last_position.x)*(end.x-last_position.x)+(end.y-last_position.y)*(end.y-last_position.y));
   //Gestion de la longueur du chemin
-    eval-=ind->path_length;
+  eval-=ind->path_length;
 
   ind->note=eval;
 }
@@ -235,7 +231,7 @@ void mutate_adn(adn_t ind){
   int threshold=1;
   //Si un individu est un elite ,note de 200, alors pas de mutation
   //alors que si un individu est tres mauvais, il mutera beaucoup
-  threshold-=ind->note/200;
+  threshold+=ind->note/200;
   //#pragma omp parallel for
   for (i = 1; i < nb_displacement; i++) {
     mut_chance=rand()%100;

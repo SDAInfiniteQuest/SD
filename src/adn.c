@@ -99,8 +99,11 @@ bool add_displacement(adn_t ind,char dir,int length){
   
   //if(new->end.x<0 ||new->end.y<0)
   //  return FALSE;
-   
-  ind->path_length+=length;
+  if(dir!=1 || dir!=3 || dir!=5 || dir!=7) 
+    ind->path_length+=length;
+  else 
+    ind->path_length+=distance(&new->start,&new->end);
+
   if(size-nb_displacement>0){
     ind->d[nb_displacement]=new;
     ind->nb_displacement++;
