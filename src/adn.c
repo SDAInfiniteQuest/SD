@@ -123,7 +123,7 @@ adn_t create_ADN(){
   new->d=malloc(sizeof(displacement_t)*100);
   point start;
   start.x=0;
-  start.y=0;
+  start.y=GRID_SIZE/2;
   new->d[0]=create_displacement(start,0,0);
   new->path_length=0;
   new->size=100;

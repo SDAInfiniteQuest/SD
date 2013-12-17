@@ -10,6 +10,22 @@ void growth_population(population_t pop){
     growth(pop->a[i]);
   }
 }
+bool displacement_outside(displacement_t d){
+  if(d->end.x<0 || d->end.y<0||d->start.x>GRID_SIZE||d->start.y>GRID_SIZE)
+    return FALSE;
+
+  return TRUE;
+}
+
+bool adn_outside(adn_t ind){
+  int i;
+  for (i = 0; i < ind->nb_displacement; i++) {
+    if(!displacement_outside(ind->d[i]))
+      return TRUE;
+  }
+  return FALSE;
+}
+
 bool test_displacement(displacement_t d,matrix_t m){
   int startX=d->start.x;
   int startY=d->start.y;
@@ -17,57 +33,88 @@ bool test_displacement(displacement_t d,matrix_t m){
   int dir=d->dir;
   int i;
 
-  //Si le deplacement sort du jeu
-  if(d->end.x<0 || d->end.y<0)
-    return FALSE;
-
+  
   if(d->start.x<0 || d->start.y<0)
+    return FALSE;
+  if(d->end.x>GRID_SIZE || d->end.y>GRID_SIZE)
     return FALSE;
 
   if(dir==0){
     for(i=0;i<length;i++){
+      if(startX<0 || startY+i<0)
+        return FALSE;
+      if(startX>GRID_SIZE || startY+i>GRID_SIZE)
+        return FALSE;
       if(getPoint(m,startX,startY+i)==1)
         return FALSE;
     }
   }
   else if(dir==1){
     for(i=0;i<length;i++){
+      if(startX+i<0 || startY+i<0)
+        return FALSE;
+      if(startX+i>GRID_SIZE || startY+i>GRID_SIZE)
+        return FALSE;
       if(getPoint(m,startX+i,startY+i)==1)
         return FALSE;
     }
   }
   else if(dir==2){
     for(i=0;i<length;i++){
+      if(startX+i<0 || startY<0)
+        return FALSE;
+      if(startX+i>GRID_SIZE || startY>GRID_SIZE)
+        return FALSE;
       if(getPoint(m,startX+i,startY)==1)
         return FALSE;
     }
   }
   else if(dir==3){
     for(i=0;i<length;i++){
+      if(startX+i<0 || startY-i<0)
+        return FALSE;
+      if(startX+i>GRID_SIZE || startY-i>GRID_SIZE)
+        return FALSE;
       if(getPoint(m,startX+i,startY-i)==1)
         return FALSE;
     }
   }
   else if(dir==4){
     for(i=0;i<length;i++){
+      if(startX<0 || startY-i<0)
+        return FALSE;
+      if(startX>GRID_SIZE || startY-i>GRID_SIZE)
+        return FALSE;
       if(getPoint(m,startX,startY-i)==1)
         return FALSE;
     }
   }
   else if(dir==5){
     for(i=0;i<length;i++){
+      if(startX-i<0 || startY-i<0)
+        return FALSE;
+      if(startX-i>GRID_SIZE || startY-i>GRID_SIZE)
+        return FALSE;
       if(getPoint(m,startX-i,startY-i)==1)
         return FALSE;
     }
   }
   else if(dir==6){
     for(i=0;i<length;i++){
+      if(startX-i<0 || startY<0)
+        return FALSE;
+      if(startX-i>GRID_SIZE || startY>GRID_SIZE)
+        return FALSE;
       if(getPoint(m,startX-i,startY)==1)
         return FALSE;
     }
   }
   else if(dir==7){
     for(i=0;i<length;i++){
+      if(startX-i<0 || startY+i<0)
+        return FALSE;
+      if(startX-i>GRID_SIZE || startY+i>GRID_SIZE)
+        return FALSE;
       if(getPoint(m,startX-i,startY+i)==1)
         return FALSE;
     }
@@ -75,13 +122,15 @@ bool test_displacement(displacement_t d,matrix_t m){
   return TRUE;
 }
 
-bool test_ADN(adn_t ind,matrix_t m){
+int test_ADN(adn_t ind,matrix_t m){
   int i;
+  int count_collision=0;
+
   for (i = 0; i < ind->nb_displacement; i++) {
-    if(!test_displacement(ind->d[i],m))
-      return FALSE;
+    if(test_displacement(ind->d[i],m)==FALSE)
+      count_collision++;
   }
-  return TRUE;
+  return count_collision;
 }
 
 //Enjambement a 30%
@@ -89,13 +138,13 @@ adn_t crossing_over(adn_t A,adn_t B){
   int size_A=A->nb_displacement;
   int size_B=B->nb_displacement;
   int chance_cross=0;
-  int threshold=30;
+  int threshold=50;
   int i;
   adn_t C;
 
   C=create_ADN();
   if (A->note>B->note){
-    threshold-=A->note/3;
+    //threshold-=A->note/3;
     for (i = 1; i < size_A; i++) {
       chance_cross=rand()%101;
       if(chance_cross<=threshold)
@@ -105,7 +154,7 @@ adn_t crossing_over(adn_t A,adn_t B){
     }
   }
   else{
-    threshold-=B->note/3;
+    //threshold-=B->note/3;
     for (i = 1; i < size_B; i++) {
       chance_cross=rand()%101;
       if(chance_cross<=threshold)
@@ -170,13 +219,17 @@ void evaluation(adn_t ind,matrix_t m){
   point last_position=ind->d[ind->nb_displacement-1]->end;
   point end=m->end;
   double eval=0;
+  int count_collision=test_ADN(ind,m);
+
   //Ne rencontre pas d'obstacle ou ne sort pas du jeu 
-  if(test_ADN(ind,m))
+  if(count_collision==0)
     eval+=100;
   else
-    eval-=100;
+    eval-=count_collision*50;
 
-
+   if (adn_outside(ind)) {
+      eval-=10000;
+   }
 
   //distance par rapport a l'arrivee
   if(last_position.x==m->end.x && last_position.y==m->end.y)
@@ -184,7 +237,7 @@ void evaluation(adn_t ind,matrix_t m){
   else
     eval+=100-sqrt((end.x-last_position.x)*(end.x-last_position.x)+(end.y-last_position.y)*(end.y-last_position.y));
   //Gestion de la longueur du chemin
-  eval-=ind->path_length;
+  //eval-=ind->path_length;
 
   ind->note=eval;
 }
@@ -216,11 +269,10 @@ void selection(population_t old,population_t new,matrix_t m){
     old->a[i]=selected->a[(POPULATION_SIZE*2-1)-i];
 
   //free tout les individu "mauvais", la moitie restante de selected
-  /*
-     for (i = 1; i <= POPULATION_SIZE; i++) {
-     free_adn(selected->a[POPULATION_SIZE-i]);
-     }
-     */
+  //for (i = 0; i < POPULATION_SIZE; i++) {
+  //  freeDna(selected->a[i]);
+  //}
+
 }
 
 //mutation aleatoire de l'ordre de 1%
@@ -231,7 +283,7 @@ void mutate_adn(adn_t ind){
   int threshold=1;
   //Si un individu est un elite ,note de 200, alors pas de mutation
   //alors que si un individu est tres mauvais, il mutera beaucoup
-  threshold+=ind->note/200;
+  //threshold+=ind->note/200;
   //#pragma omp parallel for
   for (i = 1; i < nb_displacement; i++) {
     mut_chance=rand()%100;

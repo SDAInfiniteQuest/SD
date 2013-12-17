@@ -14,8 +14,9 @@ void evaluation(adn_t ind,matrix_t m);
 void selection(population_t old,population_t new,matrix_t m);
 void mutate_adn(adn_t ind);
 bool test_displacement(displacement_t d,matrix_t m);
-bool test_ADN(adn_t ind,matrix_t m);
+int test_ADN(adn_t ind,matrix_t m);
 void genetic(matrix_t m,population_t old,population_t new );
-
+bool adn_outside(adn_t ind);
+bool displacement_outside(displacement_t d);
 
 #endif

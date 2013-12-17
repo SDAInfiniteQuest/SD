@@ -85,7 +85,13 @@ void create_world(matrix_t m,circle_t circleToDraw){
 	//a randomiser par la suite
 	start.x=0;
 	start.y=height/2;
-
+  
+  for (i = 0; i < 20; i++) {
+    for (j = 0; j < 20; j++) {
+      setPoint(m,i,j);
+    }
+  }
+  i=0;
 	//a randomiser par la suite
 	end.x=length;
 	end.y=height/2;
@@ -99,10 +105,10 @@ void create_world(matrix_t m,circle_t circleToDraw){
 	while(i<nb_circle){
 		current.center.x=rand()%length;
 		current.center.y=rand()%height;
-		current.radius=1+rand()%(min(length,height)/100);
+		current.radius=1+rand()%(min(length,height)/8);
 		//printf("(%d,%d,%d)\n",current.center.x,current.center.y,current.radius);
 
-		if((distance(&current.center,&start)<=current.radius+15) || (distance(&current.center,&end)<=current.radius+15)) 
+		if((distance(&current.center,&start)<=(current.radius+15)) || (distance(&current.center,&end)<=(current.radius+15))) 
 			not_possible=TRUE;
 
 		if(i>0)

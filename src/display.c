@@ -61,9 +61,16 @@ void displayWorld (SDL_Surface *screen, matrix_t m) {
 	Uint16 i,j;
 	for (i = 0; i < m->nb_rows; i++)
 		for (j = 0; j < m->nb_columns; j++) 
-			if(m->m[i*m->nb_columns+j]==0) putpixel(screen, i, j, 0xffffff);
+			if(getPoint(m,i,j)==0) putpixel(screen, i, j, 0xffffff);
 }
 
+void test_dessine(SDL_Surface* screen){
+  int i;
+  
+  for (i = 0; i < 50; i++) {
+    putpixel(screen,i,20,0xffffff);
+  }
+}
 void displayDisplacement (SDL_Surface *screen, displacement_t d) {
 	static Uint32 color=0x0033ff;
 
