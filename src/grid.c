@@ -73,7 +73,7 @@ matrix_t circle_in_matrix(matrix_t m, circle_t c){
 
 //Allocation de circleToDraw dans create_world
 void create_world(matrix_t m,circle_t circleToDraw){
-	int nb_circle=300000;
+	int nb_circle=10000;
 	int i=0,j=0,k=0;
 	circle obs[nb_circle];
 	circle current;
@@ -96,8 +96,8 @@ void create_world(matrix_t m,circle_t circleToDraw){
 	while(i<nb_circle){
 		current.center.x=rand()%length;
 		current.center.y=rand()%height;
-		current.radius=1+rand()%(min(length,height)/40);
-		printf("(%d,%d,%d)\n",current.center.x,current.center.y,current.radius);
+		current.radius=1+rand()%(min(length,height)/100);
+		//printf("(%d,%d,%d)\n",current.center.x,current.center.y,current.radius);
 
 		if((distance(&current.center,&start)<=current.radius+15) || (distance(&current.center,&end)<=current.radius+15)) 
 			not_possible=TRUE;
@@ -105,7 +105,7 @@ void create_world(matrix_t m,circle_t circleToDraw){
 		if(i>0)
 		{
 			for (j=0 ; j < k && not_possible==FALSE; j++) {
-	      if (distance(&current.center,&obs[j].center)<=current.radius+obs[j].radius+15) {
+	      if (distance(&current.center,&obs[j].center)<=current.radius+obs[j].radius+5) {
 					not_possible=TRUE;
 				}
 			}
