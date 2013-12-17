@@ -14,6 +14,44 @@ void compute_displacement(displacement_t dis,char dir,int length){
   point start=dis->start;
   point* end=&dis->end;
 
+	switch(dir) {
+		case SOUTH:
+	    end->x=start.x;
+	    end->y=start.y+length;
+			break;
+		case SOUTH_EAST:
+	    end->x=start.x+length;
+  	  end->y=start.y+length;
+			break;
+		case EAST:
+		  end->x=start.x+length;
+  	  end->y=start.y;
+			break;
+		case NORTH_EAST:
+	    end->x=start.x+length;
+  	  end->y=start.y-length;
+			break;
+		case NORTH:
+    	end->x=start.x;
+    	end->y=start.y-length;
+			break;
+		case NORTH_WEST:
+    	end->x=start.x-length;
+    	end->y=start.y-length;
+			break;
+		case WEST:
+    	end->x=start.x-length;
+    	end->y=start.y;
+			break;
+		case SOUTH_WEST:
+    	end->x=start.x-length;
+    	end->y=start.y+length;
+			break;
+	}
+}
+
+
+/*			
   if(dir==0){
     end->x=start.x;
     end->y=start.y+length;
@@ -54,7 +92,7 @@ void compute_displacement(displacement_t dis,char dir,int length){
     end->y=start.y+length;
     return;
   }
-}
+}*/
 
 //recalcul les debut et fin de deplacement depuis un certai index
 void recompute_adn_from_index(adn_t ind,int index){

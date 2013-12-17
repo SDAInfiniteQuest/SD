@@ -74,28 +74,28 @@ void displayDisplacement (SDL_Surface *screen, displacement_t d) {
 	for (i = 0; i < d->length; i++) {
 				printf("(%d,%d,%d,%d)\n",abs,ord,i,mv);
 		switch(mv) {
-			case 0:
+			case SOUTH:
 				putpixel(screen, abs, ord+i, color);
 				break;
-			case 1:
+			case SOUTH_EAST:
 				putpixel(screen, abs+i, ord+i, color);
 				break;
-			case 2:
+			case EAST:
 				putpixel(screen, abs+i, ord, color);
 				break;
-			case 3:
+			case NORTH_EAST:
 				putpixel(screen, abs+i, ord-i, color);
 				break;
-			case 4:
+			case NORTH:
 				putpixel(screen, abs, ord-i, color);
 				break;
-			case 5:
+			case NORTH_WEST:
 				putpixel(screen, abs-i, ord-i, color);
 				break;
-			case 6:
+			case WEST:
 				putpixel(screen, abs-i, ord, color);
 				break;
-			case 7:
+			case SOUTH_WEST:
 				putpixel(screen, abs-i, ord+i, color);
 				break;
 		}

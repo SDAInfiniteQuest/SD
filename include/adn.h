@@ -27,7 +27,14 @@
 
 #define POPULATION_SIZE 100
 
-
+#define SOUTH 			0
+#define SOUTH_EAST 	1
+#define EAST 				2
+#define NORTH_EAST 	3
+#define NORTH 			4
+#define NORTH_WEST 	5
+#define WEST 				6
+#define SOUTH_WEST 	7
 
 typedef struct str_displacement {
 	point start;
