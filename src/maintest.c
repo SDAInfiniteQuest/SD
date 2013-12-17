@@ -9,12 +9,15 @@
 
 int main(int argc, char* argv[]){
 	srand(time(NULL));
-	Uint16 i=0;
-	Uint16 j=0;
+	int i;
 	circle_t cir=NULL;
-	matrix_t m=init_matrix(800,800);
+	adn_t a=create_ADN();
+	matrix_t m=init_matrix(GRID_SIZE,GRID_SIZE);
 	create_world(m,cir);
 	SDL_Surface *screen;
+
+	for (i = 1; i < 100;) 
+		if(add_displacement(a,(char)(rand()%8), rand()%100)==TRUE) i++;
 
 	if(SDL_Init(SDL_INIT_VIDEO) == -1) {
 		fprintf(stderr, "impossible de lancer la sdl: %s\n",SDL_GetError());
@@ -28,38 +31,13 @@ int main(int argc, char* argv[]){
 
   SDL_WM_SetCaption("World and best path", NULL);
 
-	for(i=1;i<m->nb_rows;i++)  
-		for(j=1;j<m->nb_columns;j++)  
-			if(getPoint(m,i,j)==0) putpixel(screen,i,j,0xffffff);
-
+	displayWorld(screen, m);
+	displayDna(screen, a);
+	
 	SDL_Flip(screen);
 	pause();
 
-	//action();
-
 	SDL_Quit();
   return EXIT_SUCCESS;
-/*  int i;
-  circle_t circle=NULL;
-  population_t old=create_population(POPULATION_SIZE);
-  population_t new=create_population(POPULATION_SIZE);
-  population_t selected=create_population(POPULATION_SIZE*2);
-  matrix_t mat=init_matrix(600,400);
-  srand(time(NULL));
-
-  create_world(mat,circle);
   
-  init_population(old);
-  init_population(new);
-
-  for (i = 0; i < 2; i++) {
-    growth_population(old);
-    growth_population(new);
-  }
-  
-  for (i = 0; i < 10; i++) {
-    genetic(mat,old,new);
-  }
- */
-  return 0;
 }

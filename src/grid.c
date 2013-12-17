@@ -73,8 +73,8 @@ matrix_t circle_in_matrix(matrix_t m, circle_t c){
 
 //Allocation de circleToDraw dans create_world
 void create_world(matrix_t m,circle_t circleToDraw){
-	int nb_circle=300000;
-	int i=0,j=0;
+	int nb_circle=10000;
+	int i=0,j=0,k=0;
 	circle obs[nb_circle];
 	circle current;
 	int length=m->nb_columns;
@@ -99,25 +99,26 @@ void create_world(matrix_t m,circle_t circleToDraw){
 	while(i<nb_circle){
 		current.center.x=rand()%length;
 		current.center.y=rand()%height;
-		current.radius=3+rand()%(min(length,height)/40);
+		current.radius=1+rand()%(min(length,height)/100);
+		//printf("(%d,%d,%d)\n",current.center.x,current.center.y,current.radius);
 
 		if((distance(&current.center,&start)<=current.radius+15) || (distance(&current.center,&end)<=current.radius+15)) 
 			not_possible=TRUE;
 
 		if(i>0)
 		{
-			for (j=0 ; j <= i; j++) {
-	      if (distance(&current.center,&obs[j].center)<=current.radius+obs[j].radius+15) {
+			for (j=0 ; j < k && not_possible==FALSE; j++) {
+	      if (distance(&current.center,&obs[j].center)<=current.radius+obs[j].radius+5) {
 					not_possible=TRUE;
-					break;
 				}
 			}
 		}
 
 		if (not_possible==FALSE) {
-			obs[i]=current;
-			circle_in_matrix(tmp,&obs[i]);
-			circleToDraw[i]=obs[i];
+			obs[k]=current;
+			circle_in_matrix(tmp,&obs[k]);
+			circleToDraw[k]=obs[k];
+			k++;
 		}
 		i++;
 

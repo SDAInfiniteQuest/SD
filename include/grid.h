@@ -6,6 +6,8 @@
 #include <math.h>
 #include "bool.h"
 
+#define GRID_SIZE 840
+
 typedef struct str_point {
 	int x;
 	int y;
