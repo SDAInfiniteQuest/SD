@@ -31,6 +31,7 @@ bool test_displacement(displacement_t d,matrix_t m){
   int startY=d->start.y;
   int length=d->length;
   int dir=d->dir;
+  //bool tricky_case=FALSE;
   int i;
 
   
@@ -40,7 +41,7 @@ bool test_displacement(displacement_t d,matrix_t m){
     return FALSE;
 
   if(dir==0){
-    for(i=0;i<length;i++){
+    for(i=0;i<=length+1;i++){
       if(startX<0 || startY+i<0)
         return FALSE;
       if(startX>GRID_SIZE || startY+i>GRID_SIZE)
@@ -50,17 +51,26 @@ bool test_displacement(displacement_t d,matrix_t m){
     }
   }
   else if(dir==1){
-    for(i=0;i<length;i++){
+        if(getPoint(m,startX-1,startY-1+1)==1 &&
+          getPoint(m,startX-1+1,startY-1)==1){
+          return FALSE;
+        }
+    for(i=0;i<=length+1;i++){
       if(startX+i<0 || startY+i<0)
         return FALSE;
       if(startX+i>GRID_SIZE || startY+i>GRID_SIZE)
         return FALSE;
       if(getPoint(m,startX+i,startY+i)==1)
         return FALSE;
+      
+        if(getPoint(m,startX+i,startY+i+1)==1 &&
+          getPoint(m,startX+i+1,startY+i)==1){
+          return FALSE;
+        }
     }
   }
   else if(dir==2){
-    for(i=0;i<length;i++){
+    for(i=0;i<=length+1;i++){
       if(startX+i<0 || startY<0)
         return FALSE;
       if(startX+i>GRID_SIZE || startY>GRID_SIZE)
@@ -70,17 +80,27 @@ bool test_displacement(displacement_t d,matrix_t m){
     }
   }
   else if(dir==3){
-    for(i=0;i<length;i++){
+    if(getPoint(m,startX-1,startY+1-1)==1 &&
+       getPoint(m,startX-1+1,startY+1)==1){
+      return FALSE;
+    }
+    for(i=0;i<=length+1;i++){
       if(startX+i<0 || startY-i<0)
         return FALSE;
       if(startX+i>GRID_SIZE || startY-i>GRID_SIZE)
         return FALSE;
       if(getPoint(m,startX+i,startY-i)==1)
         return FALSE;
+      
+        if(getPoint(m,startX+i,startY-i-1)==1 &&
+          getPoint(m,startX+i+1,startY-i)==1){
+          return FALSE;
+        }
+
     }
   }
   else if(dir==4){
-    for(i=0;i<length;i++){
+    for(i=0;i<=length+1;i++){
       if(startX<0 || startY-i<0)
         return FALSE;
       if(startX>GRID_SIZE || startY-i>GRID_SIZE)
@@ -90,17 +110,24 @@ bool test_displacement(displacement_t d,matrix_t m){
     }
   }
   else if(dir==5){
-    for(i=0;i<length;i++){
+    for(i=0;i<=length+1;i++){
       if(startX-i<0 || startY-i<0)
         return FALSE;
       if(startX-i>GRID_SIZE || startY-i>GRID_SIZE)
         return FALSE;
       if(getPoint(m,startX-i,startY-i)==1)
         return FALSE;
+      
+      
+        if(getPoint(m,startX-i-1,startY-i)==1 &&
+          getPoint(m,startX-i,startY-i-1)==1){
+            return FALSE;
+        }
+      
     }
   }
   else if(dir==6){
-    for(i=0;i<length;i++){
+    for(i=0;i<=length+1;i++){
       if(startX-i<0 || startY<0)
         return FALSE;
       if(startX-i>GRID_SIZE || startY>GRID_SIZE)
@@ -110,13 +137,18 @@ bool test_displacement(displacement_t d,matrix_t m){
     }
   }
   else if(dir==7){
-    for(i=0;i<length;i++){
+    for(i=0;i<=length+1;i++){
       if(startX-i<0 || startY+i<0)
         return FALSE;
       if(startX-i>GRID_SIZE || startY+i>GRID_SIZE)
         return FALSE;
       if(getPoint(m,startX-i,startY+i)==1)
         return FALSE;
+     
+        if(getPoint(m,startX-i,startY+i+1)==1 &&
+          getPoint(m,startX-i-1,startY+i)==1){
+          return FALSE;
+        }
     }
   }
   return TRUE;
@@ -138,7 +170,7 @@ adn_t crossing_over(adn_t A,adn_t B){
   int size_A=A->nb_displacement;
   int size_B=B->nb_displacement;
   int chance_cross=0;
-  int threshold=50;
+  int threshold=60;
   int i;
   adn_t C;
 
@@ -200,8 +232,7 @@ void crossing_from_population(population_t old,population_t new){
   int i;
 
   flush_population(new);
-  printf("%d\n",new->nb_adn);
-  for (i = 0; i < POPULATION_SIZE-1; i++) {
+  for (i = 0; i < POPULATION_SIZE; i++) {
     population_add(crossing_over(old->a[i],old->a[(POPULATION_SIZE-1)-i]),new);
   }
 
@@ -269,9 +300,9 @@ void selection(population_t old,population_t new,matrix_t m){
     old->a[i]=selected->a[(POPULATION_SIZE*2-1)-i];
 
   //free tout les individu "mauvais", la moitie restante de selected
-  //for (i = 0; i < POPULATION_SIZE; i++) {
-  //  freeDna(selected->a[i]);
-  //}
+  for (i = 0; i < POPULATION_SIZE; i++) {
+    freeDna(selected->a[i]);
+  }
 
 }
 
@@ -311,6 +342,7 @@ void genetic(matrix_t m,population_t old,population_t new ){
   crossing_from_population(old,new);
 
   mutate_population(new);  
+  //mutate_population(old);  
   //growth_population(new);
 
 }

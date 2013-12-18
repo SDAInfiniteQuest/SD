@@ -73,7 +73,7 @@ matrix_t circle_in_matrix(matrix_t m, circle_t c){
 
 //Allocation de circleToDraw dans create_world
 void create_world(matrix_t m,circle_t circleToDraw){
-	int nb_circle=10000;
+	int nb_circle=1000;
 	int i=0,j=0,k=0;
 	circle obs[nb_circle];
 	circle current;

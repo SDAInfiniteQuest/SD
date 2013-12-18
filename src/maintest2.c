@@ -34,13 +34,13 @@ int main(int argc, char* argv[]){
 
   SDL_WM_SetCaption("World and best path", NULL);
 
-  for (i = 0; i < 100; i++) {
+  for (i = 0; i < 200; i++) {
     growth_population(old);
     growth_population(new);
   }
    // test_dessine(screen);
   displayWorld(screen, mat);
-  for (i = 0; i < 1500; i++) {
+  for (i = 0; i < 10000; i++) {
     genetic(mat,old,new);
     //displayDna(screen, old->a[0]);
     SDL_Flip(screen);
