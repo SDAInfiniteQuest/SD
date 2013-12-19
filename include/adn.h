@@ -71,5 +71,6 @@ void flush_population(population_t pop);
 void freeDna(adn_t a); 
 void freeDisplacement(displacement_t d);
 void freePopulation(population_t p);
+adn_t alloc_adn(int nb_displacement,int size,double path_length,double note);
 
 #endif

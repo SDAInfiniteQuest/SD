@@ -2,7 +2,7 @@ CFLAGS = -Wall -g -O0
 #OBJECTS = $(patsubst src/%.c, %.o, $(wildcard src/*.c))
 #OBJECTS_DIR = $(patsubst src/%.c, objets/%.o, $(wildcard src/*.c))
 CC = gcc
-LIB=-lm -lSDL
+LIB=-lm -lSDL  -lnsl
 LIB_PATH=/usr/lib/SDL
 INC_PATH = include
 SRC_PATH = src
@@ -12,12 +12,12 @@ VPATH = src:include:objets:bin
 
 ALL: main main2 server client
 
-server: server.o
-	gcc $(OBJECT) -o $@ $(OBJ_PATH)/server.o -lm
+server: server.o adn.o grid.o genetic.o quicksort.o display.o xdr_struct.o
+	gcc $(OBJECT) -o $@ $(OBJ_PATH)/adn.o $(OBJ_PATH)/grid.o $(OBJ_PATH)/display.o $(OBJ_PATH)/quicksort.o $(OBJ_PATH)/genetic.o $(OBJ_PATH)/server.o  $(OBJ_PATH)/xdr_struct.o  $(LIB)
 	@mv $@ bin/.
 	
-client: client.o
-	gcc $(OBJECT) -o $@ $(OBJ_PATH)/client.o -lm
+client: client.o adn.o grid.o genetic.o quicksort.o display.o xdr_struct.o
+	gcc $(OBJECT) -o $@ $(OBJ_PATH)/adn.o $(OBJ_PATH)/grid.o $(OBJ_PATH)/display.o $(OBJ_PATH)/quicksort.o $(OBJ_PATH)/genetic.o $(OBJ_PATH)/client.o $(OBJ_PATH)/xdr_struct.o  $(LIB)
 	@mv $@ bin/.
 
 main :maintest.o adn.o grid.o genetic.o quicksort.o display.o 
@@ -64,6 +64,9 @@ display.o: display.c display.h
 	$(CC) $(CFLAGS)  -c $< -I $(INC_PATH) -o $@ $(LIB)
 	@mv $@ objets/.
 
+xdr_struct.o: xdr_struct.c xdr_struct.h
+	$(CC) $(CFLAGS)  -c $< -I $(INC_PATH) -o $@ $(LIB)
+	@mv $@ objets/.
 
 #%.o : %.c
 #	$(CC) $(CFLAGS) -o $@ -c $< -I $(INC_PATH)

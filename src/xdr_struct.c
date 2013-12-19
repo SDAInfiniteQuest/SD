@@ -1,4 +1,5 @@
 #include "include.h"
+#include "xdr_struct.h"
 
 
 bool_t xdr_matrix(XDR *xdrs,matrix_t* e){
@@ -11,8 +12,10 @@ bool_t xdr_matrix(XDR *xdrs,matrix_t* e){
     m=(*e);
     length=m->nb_columns;
     height=m->nb_rows;
+    printf("test\n");
     if(xdr_int(xdrs,&length)!=TRUE)
       return FALSE;
+    printf("test\n");
     if(xdr_int(xdrs,&height)!=TRUE)
       return FALSE;
   }else if (xdrs->x_op==XDR_DECODE){
@@ -22,25 +25,29 @@ bool_t xdr_matrix(XDR *xdrs,matrix_t* e){
       return FALSE;
     printf("%d\n",length);
     printf("%d\n",height);
-    m=init_matrix(dim);
+    m=init_matrix(length,height);
     (*e)=m;
   }
 
-  for (i = 0; i < length; i++) {
-    for (j = 0; j < height; j++) {
+  for (i = 0; i < height; i++) {
+    for (j = 0; j < length; j++) {
 
-      if(xdr_float(xdrs,&(m->m[j*length+1]))!=TRUE)
+      if(xdr_char(xdrs,&(m->m[j*length+i]))!=TRUE){
+        printf("%d %d\n",i,j);
         return FALSE;
+      }
     }
   }
   return TRUE;
 }
 
-bool_t xdr_point(XDR* xdrs,point p){
-  if(xdr_int(xdrs,&p.x)!=TRUE)
+bool_t xdr_point(XDR* xdrs,point* p){
+  if(xdr_int(xdrs,&((*p).x))!=TRUE)
     return FALSE;
-  if(xdr_int(xdrs,&p.y)!=TRUE)
+  if(xdr_int(xdrs,&((*p).y))!=TRUE)
     return FALSE;
+
+  return TRUE;
 }
 
 bool_t xdr_displacement(XDR *xdrs, displacement_t* d) {
@@ -54,8 +61,6 @@ bool_t xdr_displacement(XDR *xdrs, displacement_t* d) {
 
     if(xdr_point(xdrs,&tmp->start)!=TRUE)
       return FALSE;
-    if(xdr_point(xdrs,&tmp->end)!=TRUE)
-      return FALSE;
     if(xdr_char(xdrs,&tmp->dir)!=TRUE)
       return FALSE;
     if(xdr_int(xdrs,&tmp->length)!=TRUE)
@@ -65,14 +70,12 @@ bool_t xdr_displacement(XDR *xdrs, displacement_t* d) {
     
     if(xdr_point(xdrs,&start)!=TRUE)
       return FALSE;
-    if(xdr_point(xdrs,&end)!=TRUE)
-      return FALSE;
     if(xdr_char(xdrs,&dir)!=TRUE)
       return FALSE;
     if(xdr_int(xdrs,&length)!=TRUE)
       return FALSE;
      
-   tmp=copy_displacement(start,end,dir,length);
+   tmp=create_displacement(start,dir,length);
    (*d)=tmp;
   }
 
@@ -86,13 +89,14 @@ bool_t xdr_adn(XDR *xdrs,adn_t* ind) {
   int nb_displacement;
   double path_length;
   double note;
-
+  int i;
+  
   if (xdrs->x_op==XDR_ENCODE){
     tmp=(*ind);
 
-    if(xdr_point(xdrs,&tmp->nb_displacement)!=TRUE)
+    if(xdr_int(xdrs,&tmp->nb_displacement)!=TRUE)
       return FALSE;
-    if(xdr_point(xdrs,&tmp->size)!=TRUE)
+    if(xdr_int(xdrs,&tmp->size)!=TRUE)
       return FALSE;
     if(xdr_double(xdrs,&tmp->path_length)!=TRUE)
       return FALSE;
@@ -102,9 +106,9 @@ bool_t xdr_adn(XDR *xdrs,adn_t* ind) {
 
   }else if (xdrs->x_op==XDR_DECODE){
     
-    if(xdr_point(xdrs,&nb_displacement)!=TRUE)
+    if(xdr_int(xdrs,&nb_displacement)!=TRUE)
       return FALSE;
-    if(xdr_point(xdrs,&size)!=TRUE)
+    if(xdr_int(xdrs,&size)!=TRUE)
       return FALSE;
     if(xdr_double(xdrs,&path_length)!=TRUE)
       return FALSE;
@@ -125,11 +129,12 @@ bool_t xdr_adn(XDR *xdrs,adn_t* ind) {
 
 //on y arrive
 bool_t xdr_population(XDR *xdrs,population_t* pop) {
-  adn_t tmp;
+  population_t tmp;
   int nb_adn;
+  int i;
 
   if (xdrs->x_op==XDR_ENCODE){
-    tmp=(*ind);
+    tmp=(*pop);
 
     if(xdr_int(xdrs,&tmp->nb_adn)!=TRUE)
       return FALSE;
@@ -139,9 +144,9 @@ bool_t xdr_population(XDR *xdrs,population_t* pop) {
     if(xdr_int(xdrs,&nb_adn)!=TRUE)
       return FALSE;
      
-    tmp=create_population();
+    tmp=create_population(POPULATION_SIZE);
     tmp->nb_adn=nb_adn;
-   (*ind)=tmp;
+   (*pop)=tmp;
   }
 
   for (i = 0; i < tmp->nb_adn; i++) {

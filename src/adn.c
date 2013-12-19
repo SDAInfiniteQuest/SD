@@ -10,6 +10,15 @@ displacement_t create_displacement(point start,char dir,int length){
   return d;
 }
 
+adn_t alloc_adn(int nb_displacement,int size,double path_length,double note){
+  adn_t new=create_ADN();
+  new->d=realloc(new->d,(size)*(sizeof(struct str_displacement)));
+  new->path_length=path_length;
+  new->note=note;
+  
+  return new;
+}
+
 void compute_displacement(displacement_t dis,char dir,int length){
   point start=dis->start;
   point* end=&dis->end;
@@ -151,10 +160,10 @@ bool add_displacement(adn_t ind,char dir,int length){
     return TRUE;
   }
   else{
-    ind->d=realloc(ind->d,(size+50)*(sizeof(struct str_displacement)));
+    ind->d=realloc(ind->d,(size*2)*(sizeof(struct str_displacement)));
     ind->d[nb_displacement]=new;
     ind->nb_displacement++;
-    ind->size+=50;
+    ind->size*=2;
     return TRUE;
   }
 }
