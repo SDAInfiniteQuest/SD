@@ -109,7 +109,7 @@ int main (void) {
   bool_t stat;
   int sock=RPC_ANYSOCK;
   unsigned int max_size=sizeof(struct str_adn)*POPULATION_SIZE*sizeof(struct str_displacement)*(NB_DISPLACEMENT+1)+sizeof(struct str_population);
-  unsigned int calm=10000000;
+  unsigned int calm=1000000;
 
   SVCXPRT *serv=NULL;
   if((serv=svctcp_create(sock,calm,calm))==NULL)
