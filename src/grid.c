@@ -44,7 +44,10 @@ int getPoint(matrix_t m,int x,int y) {
 }
 
 matrix_t circle_in_matrix(matrix_t m, circle_t c){
-	int x=0,y=c->radius;
+	int x=0;
+	int r=c->radius;
+	int y=r;
+	int d=r-1;
 	int midPoint=5-4*y;
 	int x_center=c->center.x;
 	int y_center=c->center.y;
@@ -58,12 +61,29 @@ matrix_t circle_in_matrix(matrix_t m, circle_t c){
 		setPoint(m,-x+x_center, -y+y_center ) ;
 		setPoint(m,-y+x_center, -x+y_center ) ;
 
-		if(midPoint>0){
+		if (d >= 2*x)
+		{
+			d -= 2*x + 1;
+			x ++;
+		}
+		else if (d < 2 * (r-y))
+		{
+			d += 2*y - 1;
+			y --;
+		}
+		else
+		{
+			d += 2*(y - x - 1);
+			y --;
+			x ++;
+		}
+
+		/*if(midPoint>0){
 			y--;
 			midPoint-=8*y;
 		}
 		x++;
-		midPoint+=8*x+4;
+		midPoint+=8*x+4;*/
 	}
 
 	return m;
@@ -103,13 +123,9 @@ void create_world(matrix_t m,circle_t circleToDraw){
 			not_possible=TRUE;
 
 		if(i>0)
-		{
-			for (j=0 ; j < k && not_possible==FALSE; j++) {
-	      if (distance(&current.center,&obs[j].center)<=current.radius+obs[j].radius+5) {
+			for (j=0 ; j < k && not_possible==FALSE; j++) 
+				if (distance(&current.center,&obs[j].center)<=current.radius+obs[j].radius+5) 
 					not_possible=TRUE;
-				}
-			}
-		}
 
 		if (not_possible==FALSE) {
 			obs[k]=current;
