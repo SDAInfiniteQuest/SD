@@ -13,6 +13,7 @@ displacement_t create_displacement(point start,char dir,int length){
 adn_t alloc_adn(int nb_displacement,int size,double path_length,double note){
   adn_t new=create_ADN();
   new->d=realloc(new->d,(size)*(sizeof(struct str_displacement)));
+  new->nb_displacement=nb_displacement;
   new->path_length=path_length;
   new->note=note;
   
@@ -93,6 +94,7 @@ adn_t create_ADN(){
   new->path_length=0;
   new->size=100;
   new->nb_displacement=1;
+  new->note=0;
   return new;
 }
 

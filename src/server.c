@@ -1,7 +1,7 @@
 #include "include.h"
 #include "xdr_struct.h"
 #include "display.h"
-void* affiche_jeu(matrix_t* m){
+void* affiche_jeu(matrix_t m){
 
   SDL_Surface *screen;
 	if(SDL_Init(SDL_INIT_VIDEO) == -1) {
@@ -9,21 +9,21 @@ void* affiche_jeu(matrix_t* m){
 		exit(EXIT_FAILURE);
 	}
 
-	if((screen=SDL_SetVideoMode((*m)->nb_columns,(*m)->nb_rows,32,SDL_ANYFORMAT | SDL_DOUBLEBUF | SDL_HWSURFACE))==NULL) {
+	if((screen=SDL_SetVideoMode((m)->nb_columns,(m)->nb_rows,32,SDL_ANYFORMAT | SDL_DOUBLEBUF | SDL_HWSURFACE))==NULL) {
 		fprintf(stderr, "erreur SDL %s\n", SDL_GetError());
 		exit(EXIT_FAILURE);
 	}
 
   SDL_WM_SetCaption("World and best path", NULL);
 
-	displayWorld(screen, *m);
+	displayWorld(screen,m);
 	SDL_Flip(screen);
 	pause();
   
   return NULL;
 }
 
-void* affiche_adn(adn_t* ind){
+void* affiche_adn(adn_t ind){
   
   SDL_Surface *screen;
 	if(SDL_Init(SDL_INIT_VIDEO) == -1) {
@@ -38,14 +38,14 @@ void* affiche_adn(adn_t* ind){
 
   SDL_WM_SetCaption("World and best path", NULL);
 
-	displayDna(screen, *ind);
+	displayDna(screen, ind);
 	SDL_Flip(screen);
 	pause();
 
   return NULL;
 }
 
-void* affiche_population(population_t* pop){
+void* affiche_population(population_t pop){
   int i;
   SDL_Surface *screen;
 	if(SDL_Init(SDL_INIT_VIDEO) == -1) {
@@ -59,8 +59,8 @@ void* affiche_population(population_t* pop){
 	}
 
   SDL_WM_SetCaption("World and best path", NULL);
-  for (i = 0; i < (*pop)->nb_adn; i++) {
-	  displayDna(screen, (*pop)->a[i]);
+  for (i = 0; i < (pop)->nb_adn; i++) {
+	  displayDna(screen, (pop)->a[i]);
   }
 	SDL_Flip(screen);
 	pause();
@@ -69,12 +69,13 @@ void* affiche_population(population_t* pop){
 
 
 void dispatch(struct svc_req* req,SVCXPRT* svc){
-  matrix_t* m;
-  adn_t* a;
-  population_t* pop;
+  matrix_t m;
+  adn_t a;
+  population_t pop;
 
   switch(req->rq_proc){
     case PROCNUM_DISPLAY_GAME:
+      printf("Game display\n");
       if (!svc_getargs(svc,(xdrproc_t) xdr_matrix,(caddr_t) &m)) {
         svcerr_decode(svc);
         break;
@@ -112,21 +113,21 @@ int main (void) {
   unsigned int calm=1000000;
 
   SVCXPRT *serv=NULL;
-  if((serv=svctcp_create(sock,calm,calm))==NULL)
+  if((serv=svctcp_create(RPC_ANYSOCK,calm,calm))==NULL)
     printf("Error creation serveur\n");
 
 
-//pmap_unset(PROGNUM,VERSNUM);
+pmap_unset(PROGNUM,VERSNUM);
 stat = svc_register(serv,
      /* prognum */ PROGNUM,
      /* versnum */ VERSNUM,
      /* pointeur sur dispatch */  dispatch,
      /* Protocol */ IPPROTO_TCP);
   
-  if (stat != 0) {
-    fprintf(stderr,"Echec de l'enregistrement du dispatcher\n");
-    exit(1);
-  }
+  //if (stat != 1) {
+  //  fprintf(stderr,"Echec de l'enregistrement du dispatcher\n");
+  //  exit(1);
+  //}
 
   svc_run(); /* le serveur est en attente de clients eventuels */
   return(0); /* on y passe jamais ! */

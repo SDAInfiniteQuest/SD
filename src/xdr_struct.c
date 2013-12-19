@@ -55,7 +55,7 @@ bool_t xdr_displacement(XDR *xdrs, displacement_t* d) {
   displacement_t tmp;
   int length;
   char dir;
-  point start,end;
+  point start;
 
   if (xdrs->x_op==XDR_ENCODE){
     tmp=(*d);
@@ -119,7 +119,7 @@ bool_t xdr_adn(XDR *xdrs,adn_t* ind) {
     tmp=alloc_adn(nb_displacement,size,path_length,note);
    (*ind)=tmp;
   }
-
+  
   for (i = 0; i < tmp->nb_displacement; i++) {
     if(xdr_displacement(xdrs,&tmp->d[i])!=TRUE)
       return FALSE;

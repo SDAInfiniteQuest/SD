@@ -97,7 +97,17 @@ int main (int argc, char **argv) {
     printf("Error create client\n");
     exit(0);
   }
-
+  adn_t test=create_ADN();
+  add_displacement(test,1,10);
+  add_displacement(test,1,10);
+  add_displacement(test,1,10);
+  add_displacement(test,1,10);
+  add_displacement(test,1,10);
+  add_displacement(test,3,10);
+  add_displacement(test,3,10);
+  add_displacement(test,3,10);
+  add_displacement(test,3,10);
+  add_displacement(test,3,10);
   scanf("%c",&choix);
   if(choix=='1'){
     stat = clnt_call(/* host */ serv,
@@ -110,16 +120,24 @@ int main (int argc, char **argv) {
     displayWorld(screen,mat);
   }
   else if(choix=='2'){
+    displayDna(screen,test);
+    SDL_Flip(screen);
     stat = clnt_call(/* host */ serv,
         /* procnum */ PROCNUM_DISPLAY_ADN,
         /* encodage argument */ (xdrproc_t) xdr_adn,
-        /* argument */ (caddr_t)&old->a[0],
+        /* argument */ (caddr_t)&test,
         /* decodage retour */ (xdrproc_t)xdr_void,
         /* retour de la fonction distante */(caddr_t)&res,
         /*timeout*/TIMEOUT);
     displayDna(screen,old->a[0]);
+    SDL_Flip(screen);
   }  
   else if(choix=='3'){
+    for (i = 0; i < POPULATION_SIZE; i++) {
+      displayDna(screen,old->a[i]);
+      printf("test\n");
+    }
+    SDL_Flip(screen);
     stat = clnt_call(/* host */ serv,
         /* procnum */ PROCNUM_DISPLAY_POPULATION,
         /* encodage argument */ (xdrproc_t) xdr_population,
@@ -127,9 +145,6 @@ int main (int argc, char **argv) {
         /* decodage retour */ (xdrproc_t)xdr_void,
         /* retour de la fonction distante */(caddr_t)&res,
         /*timeout*/TIMEOUT);
-    for (i = 0; i < 50; i++) {
-      displayDna(screen,old->a[i]);
-    }
   }
 
   if (stat != RPC_SUCCESS) { 
