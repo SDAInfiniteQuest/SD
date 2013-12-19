@@ -26,8 +26,6 @@ bool adn_outside(adn_t ind){
 	return FALSE;
 }
 
-// une jolie SEG_FAULT :)
-// appel impossible sur getPoint (out of bound blablabla)
 bool test_displacement(displacement_t d,matrix_t m){
 	bool retVal=TRUE;
 	int startX=d->start.x;
@@ -38,186 +36,60 @@ bool test_displacement(displacement_t d,matrix_t m){
 	int i;
 
 	if((d->start.x<0 || d->start.y<0) ||
-		(d->end.x>GRID_SIZE || d->end.y>GRID_SIZE))
-			retVal==FALSE;
+			(d->end.x>GRID_SIZE || d->end.y>GRID_SIZE))
+		retVal=FALSE;
 
 	switch(dir) {
 		case SOUTH:
 			for(i=0;i<=length+1 && retVal==TRUE;i++)
 				if((outOfBound(startX,startY+i)==TRUE) || 
-					getPoint(m,startX,startY+i)==1)
-						retVal = FALSE;
+						getPoint(m,startX,startY+i)==1)
+					retVal = FALSE;
 			break;
 		case SOUTH_EAST:
-			if(getPoint(m,startX-1,startY-1+1)==1 &&
-				getPoint(m,startX-1+1,startY-1)==1)
+			for(i=0;i<=length+1 && retVal==TRUE;i++) 
+				if((outOfBound(startX+i,startY+i)==TRUE) ||  
+						getPoint(m,startX+i,startY+i)==1)
 					retVal=FALSE;
-			else 
-				for(i=0;i<=length+1 && retVal==TRUE;i++) 
-					if((outOfBound(startX+i,startY+i)==TRUE)<0 ||  
-						getPoint(m,startX+i,startY+i)==1 || 
-						(getPoint(m,startX+i,startY+i+1)==1 && 
-						 getPoint(m,startX+i+1,startY+i)==1))
-						retVal=FALSE;
 			break;
 		case EAST:
 			for(i=0;i<=length+1 && retVal==TRUE;i++)
-				if(outOfBound(startX+i,startY)==TRUE || 
-					(getPoint(m,startX+i,startY)==1))
-						retVal=FALSE;
+				if((outOfBound(startX+i,startY)==TRUE) || 
+						(getPoint(m,startX+i,startY)==1))
+					retVal=FALSE;
 			break;
 		case NORTH_EAST:
-			if(getPoint(m,startX-1,startY+1-1)==1 &&
-				getPoint(m,startX-1+1,startY+1)==1)
+			for(i=0;i<=length+1 && retVal==TRUE;i++)
+				if(outOfBound(startX+i,startY-i)==TRUE || 
+						(getPoint(m,startX+i,startY-i)==1) )
 					retVal=FALSE;
-			else 	
-				for(i=0;i<=length+1 && retVal==TRUE;i++)
-					if(outOfBound(startX+i,startY-i)==TRUE || 
-						(getPoint(m,startX+i,startY-i)==1) ||
-						(getPoint(m,startX+i,startY-i-1)==1 &&
-						getPoint(m,startX+i+1,startY-i)==1))
-							retVal=FALSE;
 			break;
 		case NORTH:
 			for(i=0;i<=length+1 && retVal==TRUE;i++)
 				if(outOfBound(startX,startY-i)==TRUE ||
-					(getPoint(m,startX,startY-i)==1))
-						retVal==FALSE;
+						(getPoint(m,startX,startY-i)==1))
+					retVal=FALSE;
 			break;
 		case NORTH_WEST:
 			for(i=0;i<=length+1 && retVal==TRUE;i++)
 				if(outOfBound(startX-i,startY-i)==TRUE ||
-					(getPoint(m,startX-i,startY-i)==1) ||
-					(getPoint(m,startX-i-1,startY-i)==1 &&
-					getPoint(m,startX-i,startY-i-1)==1))
-						retVal=FALSE;
+						(getPoint(m,startX-i,startY-i)==1))
+					retVal=FALSE;
 			break;
 		case WEST:
 			for(i=0;i<=length+1 && retVal==TRUE;i++)
 				if(outOfBound(startX-i,startY)==TRUE ||
-					(getPoint(m,startX-i,startY)==1))
-						retVal=FALSE;
+						(getPoint(m,startX-i,startY)==1))
+					retVal=FALSE;
 			break;
 		case SOUTH_WEST:
 			for(i=0;i<=length+1 && retVal==TRUE;i++) 
 				if(outOfBound(startX-i,startY+i)==TRUE ||
-					(getPoint(m,startX-i,startY+i+1)==1 &&
-					getPoint(m,startX-i-1,startY+i)==1))
-						retVal=FALSE;
+						(getPoint(m,startX-i,startY+i)==1)) 
+					retVal=FALSE;
 			break;
 	}
-		
-	/*if(dir==0){
-		for(i=0;i<=length+1;i++){
-			if(startX<0 || startY+i<0)
-				return FALSE;
-			if(startX>GRID_SIZE || startY+i>GRID_SIZE)
-				return FALSE;
-			if(getPoint(m,startX,startY+i)==1)
-				return FALSE;
-		}
-	}
-	else if(dir==1){
-		if(getPoint(m,startX-1,startY-1+1)==1 &&
-				getPoint(m,startX-1+1,startY-1)==1){
-			return FALSE;
-		}
-		for(i=0;i<=length+1;i++){
-			if(startX+i<0 || startY+i<0)
-				return FALSE;
-			if(startX+i>GRID_SIZE || startY+i>GRID_SIZE)
-				return FALSE;
-			if(getPoint(m,startX+i,startY+i)==1)
-				return FALSE;
 
-			if(getPoint(m,startX+i,startY+i+1)==1 &&
-					getPoint(m,startX+i+1,startY+i)==1){
-				return FALSE;
-			}
-		}
-	}
-	else if(dir==2){
-		for(i=0;i<=length+1;i++){
-			if(startX+i<0 || startY<0)
-				return FALSE;
-			if(startX+i>GRID_SIZE || startY>GRID_SIZE)
-				return FALSE;
-			if(getPoint(m,startX+i,startY)==1)
-				return FALSE;
-		}
-	}
-	else if(dir==3){
-		if(getPoint(m,startX-1,startY+1-1)==1 &&
-				getPoint(m,startX-1+1,startY+1)==1){
-			return FALSE;
-		}
-		for(i=0;i<=length+1;i++){
-			if(startX+i<0 || startY-i<0)
-				return FALSE;
-			if(startX+i>GRID_SIZE || startY-i>GRID_SIZE)
-				return FALSE;
-			if(getPoint(m,startX+i,startY-i)==1)
-				return FALSE;
-
-			if(getPoint(m,startX+i,startY-i-1)==1 &&
-					getPoint(m,startX+i+1,startY-i)==1){
-				return FALSE;
-			}
-
-		}
-	}
-	else if(dir==4){
-		for(i=0;i<=length+1;i++){
-			if(startX<0 || startY-i<0)
-				return FALSE;
-			if(startX>GRID_SIZE || startY-i>GRID_SIZE)
-				return FALSE;
-			if(getPoint(m,startX,startY-i)==1)
-				return FALSE;
-		}
-	}
-	else if(dir==5){
-		for(i=0;i<=length+1;i++){
-			if(startX-i<0 || startY-i<0)
-				return FALSE;
-			if(startX-i>GRID_SIZE || startY-i>GRID_SIZE)
-				return FALSE;
-			if(getPoint(m,startX-i,startY-i)==1)
-				return FALSE;
-
-
-			if(getPoint(m,startX-i-1,startY-i)==1 &&
-					getPoint(m,startX-i,startY-i-1)==1){
-				return FALSE;
-			}
-
-		}
-	}
-	else if(dir==6){
-		for(i=0;i<=length+1;i++){
-			if(startX-i<0 || startY<0)
-				return FALSE;
-			if(startX-i>GRID_SIZE || startY>GRID_SIZE)
-				return FALSE;
-			if(getPoint(m,startX-i,startY)==1)
-				return FALSE;
-		}
-	}
-	else if(dir==7){
-		for(i=0;i<=length+1;i++){
-			if(startX-i<0 || startY+i<0)
-				return FALSE;
-			if(startX-i>GRID_SIZE || startY+i>GRID_SIZE)
-				return FALSE;
-			if(getPoint(m,startX-i,startY+i)==1)
-				return FALSE;
-
-			if(getPoint(m,startX-i,startY+i+1)==1 &&
-					getPoint(m,startX-i-1,startY+i)==1){
-				return FALSE;
-			}
-		}
-	}*/
 	return retVal;
 }
 

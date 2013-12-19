@@ -39,17 +39,13 @@ int main(int argc, char* argv[]){
     growth_population(old);
     growth_population(new);
   }
-   // test_dessine(screen);
-  //displayWorld(screen, mat);
+
   for (i = 0; i < 10000; i++) {
     genetic(mat,old,new);
-		printf("entree section affichage\n");
   	displayWorld(screen, mat);
 		displayDna(screen,old->a[0]);
     SDL_Flip(screen);
-		printf("sortie section affichage\n");
   }
-    //displayDna(screen, old->a[0]);
 
   printf("collision %d note %f\n",test_ADN(old->a[0],mat),old->a[0]->note); 
 
