@@ -28,6 +28,7 @@ typedef struct str_matrix{
 
 
 
+bool outOfBound(int ,int);
 matrix_t init_matrix(int height,int length);
 int min(int a,int b);
 double distance(point_t p1,point_t p2);

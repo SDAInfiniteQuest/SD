@@ -47,20 +47,18 @@ bool test_displacement(displacement_t d,matrix_t m){
 
 	switch(dir) {
 		case SOUTH:
-			for(i=0;i<=length+1 && retVal==TRUE;i++){
-				if(startX<0 || startY+i<0 || startX>GRID_SIZE || startY+i>GRID_SIZE || getPoint(m,startX,startY+i)==1) {
-					retVal = FALSE;
-				}
-			}
+			for(i=0;i<=length+1 && retVal==TRUE;i++)
+				if((outOfBound(startX,startY+i)==TRUE) || 
+					getPoint(m,startX,startY+i)==1)
+						retVal = FALSE;
 			break;
 		case SOUTH_EAST:
 			if(getPoint(m,startX-1,startY-1+1)==1 &&
-					getPoint(m,startX-1+1,startY-1)==1)
-				retVal=FALSE;
+				getPoint(m,startX-1+1,startY-1)==1)
+					retVal=FALSE;
 			else 
 				for(i=0;i<=length+1 && retVal==TRUE;i++) 
-					if(startX+i<0 || startY+i<0 ||
-						startX+i>GRID_SIZE || startY+i>GRID_SIZE || 
+					if((outOfBound(startX+i,startY+i)==TRUE)<0 ||  
 						getPoint(m,startX+i,startY+i)==1 || 
 						(getPoint(m,startX+i,startY+i+1)==1 && 
 						 getPoint(m,startX+i+1,startY+i)==1))
@@ -68,8 +66,7 @@ bool test_displacement(displacement_t d,matrix_t m){
 			break;
 		case EAST:
 			for(i=0;i<=length+1 && retVal==TRUE;i++)
-				if((startX+i<0 || startY<0) ||
-					(startX+i>GRID_SIZE || startY>GRID_SIZE) ||
+				if(outOfBound(startX+i,startY)==TRUE || 
 					(getPoint(m,startX+i,startY)==1))
 						retVal=FALSE;
 			break;
@@ -79,8 +76,7 @@ bool test_displacement(displacement_t d,matrix_t m){
 					retVal=FALSE;
 			else 	
 				for(i=0;i<=length+1 && retVal==TRUE;i++)
-					if((startX+i<0 || startY-i<0) ||
-						(startX+i>GRID_SIZE || startY-i>GRID_SIZE) ||
+					if(outOfBound(startX+i,startY-i)==TRUE || 
 						(getPoint(m,startX+i,startY-i)==1) ||
 						(getPoint(m,startX+i,startY-i-1)==1 &&
 						getPoint(m,startX+i+1,startY-i)==1))
@@ -88,15 +84,13 @@ bool test_displacement(displacement_t d,matrix_t m){
 			break;
 		case NORTH:
 			for(i=0;i<=length+1 && retVal==TRUE;i++)
-				if((startX<0 || startY-i<0) ||
-					(startX>GRID_SIZE || startY-i>GRID_SIZE) ||
+				if(outOfBound(startX,startY-i)==TRUE ||
 					(getPoint(m,startX,startY-i)==1))
 						retVal==FALSE;
 			break;
 		case NORTH_WEST:
 			for(i=0;i<=length+1 && retVal==TRUE;i++)
-				if((startX-i<0 || startY-i<0) ||
-					(startX-i>GRID_SIZE || startY-i>GRID_SIZE) ||
+				if(outOfBound(startX-i,startY-i)==TRUE ||
 					(getPoint(m,startX-i,startY-i)==1) ||
 					(getPoint(m,startX-i-1,startY-i)==1 &&
 					getPoint(m,startX-i,startY-i-1)==1))
@@ -104,15 +98,13 @@ bool test_displacement(displacement_t d,matrix_t m){
 			break;
 		case WEST:
 			for(i=0;i<=length+1 && retVal==TRUE;i++)
-				if((startX-i<0 || startY<0) ||
-					(startX-i>GRID_SIZE || startY>GRID_SIZE) ||
+				if(outOfBound(startX-i,startY)==TRUE ||
 					(getPoint(m,startX-i,startY)==1))
 						retVal=FALSE;
 			break;
 		case SOUTH_WEST:
 			for(i=0;i<=length+1 && retVal==TRUE;i++) 
-				if((startX-i<0 || startY+i<0) ||
-					(startX-i>GRID_SIZE || startY+i>GRID_SIZE) ||
+				if(outOfBound(startX-i,startY+i)==TRUE ||
 					(getPoint(m,startX-i,startY+i+1)==1 &&
 					getPoint(m,startX-i-1,startY+i)==1))
 						retVal=FALSE;

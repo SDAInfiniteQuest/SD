@@ -1,5 +1,10 @@
 #include "grid.h"
 
+bool outOfBound(int x,int y) {
+	if(x<0 || y<0 || x>GRID_SIZE || y> GRID_SIZE) return TRUE;
+	else return FALSE;
+}
+
 matrix_t init_matrix(int height,int length){
 	matrix_t mat;
 	mat=malloc(sizeof(struct str_matrix));
