@@ -13,6 +13,7 @@ int main (int argc, char **argv) {
     printf("Usage :%s [IP serveur]\n",argv[0]);
   }
   
+  static struct timeval TIMEOUT={10000,0};
   population_t old=create_population(POPULATION_SIZE);
   population_t new=create_population(POPULATION_SIZE);
 
@@ -46,38 +47,36 @@ int main (int argc, char **argv) {
 	SDL_Flip(screen);
 
   scanf("%c",&choix);
+  CLIENT* serv=clnt_create(argv[1],PROGNUM,VERSNUM,"tcp");
 
   if(choix=='1'){
-    stat = callrpc(/* host */ host,
-        /* prognum */ PROGNUM,
-        /* versnum */ VERSNUM,
+    stat = clnt_call(/* host */ serv,
         /* procnum */ PROCNUM_DISPLAY_GAME,
         /* encodage argument */ (xdrproc_t) xdr_matrix,
-        /* argument */ (char *)&mat,
+        /* argument */ (caddr_t)&mat,
         /* decodage retour */ (xdrproc_t)xdr_void,
-        /* retour de la fonction distante */(char *)&res);
+        /* retour de la fonction distante */(caddr_t)&res,
+        /*timeout*/TIMEOUT);
     displayWorld(screen,mat);
   }
   else if(choix=='2'){
-    stat = callrpc(/* host */ host,
-        /* prognum */ PROGNUM,
-        /* versnum */ VERSNUM,
+    stat = clnt_call(/* host */ host,
         /* procnum */ PROCNUM_DISPLAY_ADN,
         /* encodage argument */ (xdrproc_t) xdr_adn,
-        /* argument */ (char *)&old->a[0],
+        /* argument */ (caddr_t)&old->a[0],
         /* decodage retour */ (xdrproc_t)xdr_void,
-        /* retour de la fonction distante */(char *)&res);
+        /* retour de la fonction distante */(caddr_t)&res,
+        /*timeout*/TIMEOUT);
     displayDna(screen,old->a[0]);
   }  
   else if(choix=='3'){
-    stat = callrpc(/* host */ host,
-        /* prognum */ PROGNUM,
-        /* versnum */ VERSNUM,
+    stat = clnt_call(/* host */ host,
         /* procnum */ PROCNUM_DISPLAY_POPULATION,
         /* encodage argument */ (xdrproc_t) xdr_population,
-        /* argument */ (char *)&old,
+        /* argument */ (caddr_t)&old,
         /* decodage retour */ (xdrproc_t)xdr_void,
-        /* retour de la fonction distante */(char *)&res);
+        /* retour de la fonction distante */(caddr_t)&res,
+        /*timeout*/TIMEOUT);
     for (i = 0; i < 50; i++) {
       displayDna(screen,old->a[i]);
     }

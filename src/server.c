@@ -66,39 +66,63 @@ void* affiche_population(population_t* pop){
 	pause();
   return NULL;
 }
+
+
+void dispatch(struct svc_req* req,SVCXPRT* svc){
+  matrix_t* m;
+  adn_t* a;
+  population_t* pop;
+
+  switch(req->rq_proc){
+    case PROCNUM_DISPLAY_GAME:
+      if (!svc_getargs(svc,(xdrproc_t) xdr_matrix,(caddr_t) &m)) {
+        svcerr_decode(svc);
+        break;
+      }
+      affiche_jeu(m);
+      if (!svc_sendreply(svc,(xdrproc_t) xdr_void,(caddr_t) 0)) printf("Erreur traitement call RPC\n");
+      break;
+    case PROCNUM_DISPLAY_ADN:
+      if (!svc_getargs(svc,(xdrproc_t) xdr_adn,(caddr_t) &a)) {
+        svcerr_decode(svc);
+        break;
+      }
+      affiche_adn(a);
+      if (!svc_sendreply(svc,(xdrproc_t) xdr_void,(caddr_t) 0)) printf("Erreur traitement call RPC\n");
+      break;
+    case PROCNUM_DISPLAY_POPULATION:
+      if (!svc_getargs(svc,(xdrproc_t) xdr_population,(caddr_t) &pop)) {
+        svcerr_decode(svc);
+        break;
+      }
+      affiche_population(pop);
+      if (!svc_sendreply(svc,(xdrproc_t) xdr_void,(caddr_t) 0)) printf("Erreur traitement call RPC\n");
+      break;
+    default:
+      svcerr_noproc(svc);
+      break;
+  }
+  return;
+}
+
 int main (void) {
   bool_t stat;
+  int sock=RPC_ANYSOCK;
+  unsigned int max_size=sizeof(struct str_adn)*POPULATION_SIZE*sizeof(struct str_displacement)*(NB_DISPLACEMENT+1)+sizeof(struct str_population);
+  unsigned int calm=10000000;
 
-stat = registerrpc(/* prognum */ PROGNUM,
+  SVCXPRT *serv=svctcp_create(sock,calm,calm);
+
+
+pmap_unset(PROGNUM,VERSNUM);
+stat = svc_register(serv,
+     /* prognum */ PROGNUM,
      /* versnum */ VERSNUM,
-     /* procnum */ PROCNUM_DISPLAY_GAME,
-     /* pointeur sur fonction */  affiche_jeu,
-     /* decodage arguments */ (xdrproc_t)xdr_matrix,
-     /* encodage retour de fonction */ (xdrproc_t)xdr_void);
+     /* pointeur sur dispatch */  dispatch,
+     /* Protocol */ IPPROTO_TCP);
   
   if (stat != 0) {
-    fprintf(stderr,"Echec de l'enregistrement\n");
-    exit(1);
-  }
- stat = registerrpc(/* prognum */ PROGNUM,
-     /* versnum */ VERSNUM,
-     /* procnum */ PROCNUM_DISPLAY_ADN,
-     /* pointeur sur fonction */  affiche_adn,
-     /* decodage arguments */ (xdrproc_t)xdr_adn,
-     /* encodage retour de fonction */ (xdrproc_t)xdr_void);
-  
-  if (stat != 0) {
-    fprintf(stderr,"Echec de l'enregistrement\n");
-    exit(1);
-  }
- stat = registerrpc(/* prognum */ PROGNUM,
-     /* versnum */ VERSNUM,
-     /* procnum */ PROCNUM_DISPLAY_POPULATION,
-     /* pointeur sur fonction */  affiche_population,
-     /* decodage arguments */ (xdrproc_t)xdr_population,
-     /* encodage retour de fonction */ (xdrproc_t)xdr_void);
-  if (stat != 0) {
-    fprintf(stderr,"Echec de l'enregistrement\n");
+    fprintf(stderr,"Echec de l'enregistrement du dispatcher\n");
     exit(1);
   }
 

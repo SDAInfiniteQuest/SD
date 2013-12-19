@@ -26,6 +26,8 @@
 #include "grid.h"
 
 #define POPULATION_SIZE 1000 
+#define NB_DISPLACEMENT 100
+#define NB_GENERATION 1000
 
 #define SOUTH 			0
 #define SOUTH_EAST 	1

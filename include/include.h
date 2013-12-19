@@ -10,7 +10,7 @@
 #define VERSNUM 1
 #define PROCNUM_DISPLAY_GAME 1 //Affiche le jeu sur le serveur
 #define PROCNUM_DISPLAY_ADN 2 //Affiche l'adn sur le serveur 
-#define PROCNUM_DISPLAY_POPULATION 2 //Affiche la population sur le serveur
+#define PROCNUM_DISPLAY_POPULATION 3 //Affiche la population sur le serveur
 
 
 #endif /* INCRPC */

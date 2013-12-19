@@ -35,12 +35,12 @@ int main(int argc, char* argv[]){
 
   SDL_WM_SetCaption("World and best path", NULL);
 
-  for (i = 0; i < 120; i++) {
+  for (i = 0; i < NB_DISPLACEMENT; i++) {
     growth_population(old);
     growth_population(new);
   }
 
-  for (i = 0; i < 1000; i++) {
+  for (i = 0; i < NB_GENERATION; i++) {
     genetic(mat,old,new);
   	displayWorld(screen, mat);
 		displayDna(screen,old->a[0]);
