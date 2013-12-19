@@ -29,15 +29,16 @@ bool_t xdr_matrix(XDR *xdrs,matrix_t* e){
     (*e)=m;
   }
 
-  for (i = 0; i < height; i++) {
-    for (j = 0; j < length; j++) {
+  //for (i = 0; i < height; i++) {
+  //  for (j = 0; j < length; j++) {
 
-      if(xdr_char(xdrs,&(m->m[j*length+i]))!=TRUE){
-        printf("%d %d\n",i,j);
-        return FALSE;
-      }
-    }
-  }
+  //    if(xdr_char(xdrs,&(m->m[j*length+i]))!=TRUE){
+  //      printf("%d %d\n",i,j);
+  //      return FALSE;
+  //    }
+  //  }
+  //}
+  xdr_vector(xdrs,(m->m),length*height,sizeof(char),(xdrproc_t)xdr_char);
   return TRUE;
 }
 
