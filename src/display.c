@@ -1,6 +1,6 @@
 #include "display.h"
 
-void pause() {
+void action() {
 	int stop = 1;
 	SDL_Event event;
 
@@ -61,9 +61,16 @@ void displayWorld (SDL_Surface *screen, matrix_t m) {
 	Uint16 i,j;
 	for (i = 0; i < m->nb_rows; i++)
 		for (j = 0; j < m->nb_columns; j++) 
-			if(m->m[i*m->nb_columns+j]==0) putpixel(screen, i, j, 0xffffff);
+			if(getPoint(m,i,j)==0) putpixel(screen, i, j, 0xffffff);
 }
 
+void test_dessine(SDL_Surface* screen){
+  int i;
+  
+  for (i = 0; i < 50; i++) {
+    putpixel(screen,i,20,0xffffff);
+  }
+}
 void displayDisplacement (SDL_Surface *screen, displacement_t d) {
 	static Uint32 color=0x0033ff;
 
@@ -72,35 +79,43 @@ void displayDisplacement (SDL_Surface *screen, displacement_t d) {
 	int abs=d->start.x;
 	int ord=d->start.y;
 	for (i = 0; i < d->length; i++) {
-				printf("(%d,%d,%d,%d)\n",abs,ord,i,mv);
+				//printf("(%d,%d,%d,%d)\n",abs,ord,i,mv);
 		switch(mv) {
 			case SOUTH:
-				putpixel(screen, abs, ord+i, color);
+				if(!(abs<0||ord+i<0||abs>GRID_SIZE||ord+i>GRID_SIZE))
+					putpixel(screen, abs, ord+i, color);
 				break;
 			case SOUTH_EAST:
-				putpixel(screen, abs+i, ord+i, color);
+				if(!(abs<0||ord+i<0||abs>GRID_SIZE||ord+i>GRID_SIZE))
+					putpixel(screen, abs+i, ord+i, color);
 				break;
 			case EAST:
-				putpixel(screen, abs+i, ord, color);
+				if(!(abs+i<0||ord<0||abs+i>GRID_SIZE||ord>GRID_SIZE))
+					putpixel(screen, abs+i, ord, color);
 				break;
 			case NORTH_EAST:
-				putpixel(screen, abs+i, ord-i, color);
+				if(!(abs+i<0||ord-i<0||abs+i>GRID_SIZE||ord-i>GRID_SIZE))
+					putpixel(screen, abs+i, ord-i, color);
 				break;
 			case NORTH:
-				putpixel(screen, abs, ord-i, color);
+				if(!(abs<0||ord-i<0||ord>GRID_SIZE||ord-i>GRID_SIZE))
+					putpixel(screen, abs, ord-i, color);
 				break;
 			case NORTH_WEST:
-				putpixel(screen, abs-i, ord-i, color);
+				if(!(abs-i<0||ord-i<0||abs-i>GRID_SIZE||ord-i>GRID_SIZE))
+					putpixel(screen, abs-i, ord-i, color);
 				break;
 			case WEST:
-				putpixel(screen, abs-i, ord, color);
+				if(!(abs-i<0||ord<0||abs-i>GRID_SIZE||ord>GRID_SIZE))
+					putpixel(screen, abs-i, ord, color);
 				break;
 			case SOUTH_WEST:
-				putpixel(screen, abs-i, ord+i, color);
+				if(!(abs-i<0||ord+i<0||abs-i>GRID_SIZE||ord+i>GRID_SIZE))
+					putpixel(screen, abs-i, ord+i, color);
 				break;
 		}
 	}
-	if(color>0x0) color-=10;
+	//if(color>0x0) color-=10;
 	//printf("%d\n",color);
 }
 

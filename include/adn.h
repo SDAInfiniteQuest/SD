@@ -47,7 +47,7 @@ typedef struct str_adn {
 	displacement_t* d;
 	int nb_displacement;
 	int size;//nombre de place restante en memoire
-	double path_lenght; //longueur du chemin parcouru 
+	double path_length; //longueur du chemin parcouru 
 	double note; //note apres evalutaion
 }adn,*adn_t;
 
@@ -67,10 +67,10 @@ population_t create_population(int size);
 bool population_add(adn_t ind,population_t pop);
 adn_t create_ADN();
 void init_population(population_t pop);
-
-
+void flush_population(population_t pop);
 void freeDna(adn_t a); 
 void freeDisplacement(displacement_t d);
 void freePopulation(population_t p);
+adn_t alloc_adn(int nb_displacement,int size,double path_length,double note);
 
 #endif

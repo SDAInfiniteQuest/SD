@@ -10,6 +10,15 @@ displacement_t create_displacement(point start,char dir,int length){
   return d;
 }
 
+adn_t alloc_adn(int nb_displacement,int size,double path_length,double note){
+  adn_t new=create_ADN();
+  new->d=realloc(new->d,(size)*(sizeof(struct str_displacement)));
+  new->path_length=path_length;
+  new->note=note;
+  
+  return new;
+}
+
 void compute_displacement(displacement_t dis,char dir,int length){
   point start=dis->start;
   point* end=&dis->end;
@@ -50,50 +59,6 @@ void compute_displacement(displacement_t dis,char dir,int length){
 	}
 }
 
-
-/*			
-  if(dir==0){
-    end->x=start.x;
-    end->y=start.y+length;
-    return;
-  }
-  else if(dir==1){
-    end->x=start.x+length;
-    end->y=start.y+length;
-    return;
-  }
-  else if(dir==2){
-    end->x=start.x+length;
-    end->y=start.y;
-    return;
-  }
-  else if(dir==3){
-    end->x=start.x+length;
-    end->y=start.y-length;
-    return;
-  }
-  else if(dir==4){
-    end->x=start.x;
-    end->y=start.y-length;
-    return;
-  }
-  else if(dir==5){
-    end->x=start.x-length;
-    end->y=start.y-length;
-    return;
-  }
-  else if(dir==6){
-    end->x=start.x-length;
-    end->y=start.y;
-    return;
-  }
-  else if(dir==7){
-    end->x=start.x-length;
-    end->y=start.y+length;
-    return;
-  }
-}*/
-
 //recalcul les debut et fin de deplacement depuis un certai index
 void recompute_adn_from_index(adn_t ind,int index){
   int size_adn=ind->nb_displacement;
@@ -103,6 +68,10 @@ void recompute_adn_from_index(adn_t ind,int index){
     ind->d[index]->start=ind->d[index-1]->end;
     compute_displacement(ind->d[index],ind->d[index]->dir,ind->d[index]->length);
   }
+}
+
+void flush_population(population_t pop){
+  pop->nb_adn=0;
 }
 
 //recalcul tout les deplacement d'un adn
@@ -119,9 +88,9 @@ adn_t create_ADN(){
   new->d=malloc(sizeof(displacement_t)*100);
   point start;
   start.x=0;
-  start.y=0;
+  start.y=GRID_SIZE/2;
   new->d[0]=create_displacement(start,0,0);
-
+  new->path_length=0;
   new->size=100;
   new->nb_displacement=1;
   return new;
@@ -134,10 +103,12 @@ bool add_displacement(adn_t ind,char dir,int length){
   int size=ind->size;
   int nb_displacement=ind->nb_displacement;
   
-  if(new->end.x<0 ||new->end.y<0 ||new->end.x>GRID_SIZE || new->end.y>GRID_SIZE){
-		freeDisplacement(new);
-    return FALSE;
-	}
+  //if(new->end.x<0 ||new->end.y<0)
+  //  return FALSE;
+  if(dir!=1 || dir!=3 || dir!=5 || dir!=7) 
+    ind->path_length+=length;
+  else 
+    ind->path_length+=distance(&new->start,&new->end);
 
   if(size-nb_displacement>0){
     ind->d[nb_displacement]=new;
@@ -145,10 +116,10 @@ bool add_displacement(adn_t ind,char dir,int length){
     return TRUE;
   }
   else{
-    ind->d=realloc(ind->d,(size+50)*(sizeof(struct str_displacement)));
+    ind->d=realloc(ind->d,(size*2)*(sizeof(struct str_displacement)));
     ind->d[nb_displacement]=new;
     ind->nb_displacement++;
-    ind->size+=50;
+    ind->size*=2;
     return TRUE;
   }
 }

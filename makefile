@@ -2,7 +2,7 @@ CFLAGS = -Wall -g -O0
 #OBJECTS = $(patsubst src/%.c, %.o, $(wildcard src/*.c))
 #OBJECTS_DIR = $(patsubst src/%.c, objets/%.o, $(wildcard src/*.c))
 CC = gcc
-LIB=-lm -lSDL
+LIB=-lm -lSDL  -lnsl
 LIB_PATH=/usr/lib/SDL
 INC_PATH = include
 SRC_PATH = src
@@ -10,52 +10,63 @@ OBJ_PATH = objets
 BIN_PATH = bin
 VPATH = src:include:objets:bin
 
-ALL: main server client
+ALL: main main2 server client
 
-server: server.o
-	gcc $(OBJECT) -o $@ $(OBJ_PATH)/server.o -lm
-	mv $@ bin/.
+server: server.o adn.o grid.o genetic.o quicksort.o display.o xdr_struct.o
+	gcc $(OBJECT) -o $@ $(OBJ_PATH)/adn.o $(OBJ_PATH)/grid.o $(OBJ_PATH)/display.o $(OBJ_PATH)/quicksort.o $(OBJ_PATH)/genetic.o $(OBJ_PATH)/server.o  $(OBJ_PATH)/xdr_struct.o  $(LIB)
+	@mv $@ bin/.
 	
-client: client.o
-	gcc $(OBJECT) -o $@ $(OBJ_PATH)/client.o -lm
-	mv $@ bin/.
+client: client.o adn.o grid.o genetic.o quicksort.o display.o xdr_struct.o
+	gcc $(OBJECT) -o $@ $(OBJ_PATH)/adn.o $(OBJ_PATH)/grid.o $(OBJ_PATH)/display.o $(OBJ_PATH)/quicksort.o $(OBJ_PATH)/genetic.o $(OBJ_PATH)/client.o $(OBJ_PATH)/xdr_struct.o  $(LIB)
+	@mv $@ bin/.
 
 main :maintest.o adn.o grid.o genetic.o quicksort.o display.o 
 	gcc $(CFLAGS) -o $@ $(OBJ_PATH)/adn.o $(OBJ_PATH)/grid.o $(OBJ_PATH)/display.o $(OBJ_PATH)/quicksort.o $(OBJ_PATH)/genetic.o $(OBJ_PATH)/maintest.o  $(LIB)
-	mv $@ bin/.
+	@mv $@ bin/.
+
+main2 :maintest2.o adn.o grid.o genetic.o quicksort.o display.o 
+	gcc $(CFLAGS) -o $@ $(OBJ_PATH)/adn.o $(OBJ_PATH)/grid.o $(OBJ_PATH)/display.o $(OBJ_PATH)/quicksort.o $(OBJ_PATH)/genetic.o $(OBJ_PATH)/maintest2.o  $(LIB)
+	@mv $@ bin/.
 
 maintest.o: maintest.c adn.h genetic.h display.h
 	$(CC) $(CFLAGS)  -c $< -I $(INC_PATH) -o $@ -I $(LIB_PATH) $(LIB)
-	mv $@ objets/.
+	@mv $@ objets/.
+
+maintest2.o: maintest2.c adn.h genetic.h display.h
+	$(CC) $(CFLAGS)  -c $< -I $(INC_PATH) -o $@ -I $(LIB_PATH) $(LIB)
+	@mv $@ objets/.
 
 adn.o: adn.c adn.h 
 	$(CC) $(CFLAGS)  -c $< -I $(INC_PATH) -o $@
-	mv $@ objets/.
+	@mv $@ objets/.
 
 genetic.o: genetic.c genetic.h adn.h grid.h
 	$(CC) $(CFLAGS)  -c $< -I $(INC_PATH) -o $@
-	mv $@ objets/.
+	@mv $@ objets/.
 
 grid.o: grid.c grid.h
 	$(CC) $(CFLAGS)  -c $< -I $(INC_PATH) -o $@
-	mv $@ objets/.
+	@mv $@ objets/.
 
 quicksort.o: quicksort.c quicksort.h
 	$(CC) $(CFLAGS)  -c $< -I $(INC_PATH) -o $@
-	mv $@ objets/.
+	@mv $@ objets/.
 
 server.o: server.c include.h
 	$(CC) $(CFLAGS)  -c $< -I $(INC_PATH) -o $@
-	mv $@ objets/.
+	@mv $@ objets/.
 
 client.o: client.c include.h
 	$(CC) $(CFLAGS)  -c $< -I $(INC_PATH) -o $@
-	mv $@ objets/.
+	@mv $@ objets/.
 
 display.o: display.c display.h
 	$(CC) $(CFLAGS)  -c $< -I $(INC_PATH) -o $@ $(LIB)
-	mv $@ objets/.
+	@mv $@ objets/.
 
+xdr_struct.o: xdr_struct.c xdr_struct.h
+	$(CC) $(CFLAGS)  -c $< -I $(INC_PATH) -o $@ $(LIB)
+	@mv $@ objets/.
 
 #%.o : %.c
 #	$(CC) $(CFLAGS) -o $@ -c $< -I $(INC_PATH)
@@ -68,5 +79,5 @@ test:
 	gcc $(CFLAGS) -o bin/exec objets/*.o -lm
 
 clean : 
-	rm $(OBJ_PATH)/*.o $(BIN_PATH)/main 
+	rm $(OBJ_PATH)/*.o $(BIN_PATH)/main $(BIN_PATH)/main2
 	rm *~ $(INC_PATH)/*~ $(SRC_PATH)/*~

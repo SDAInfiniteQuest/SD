@@ -3,6 +3,7 @@
 #include <time.h>
 #include "adn.h"
 #include "genetic.h"
+#include <time.h>
 #include "display.h"
 
 
@@ -34,8 +35,9 @@ int main(int argc, char* argv[]){
 	displayDna(screen, a);
 	
 	SDL_Flip(screen);
-	pause();
+	action();
 
 	SDL_Quit();
   return EXIT_SUCCESS;
+  
 }

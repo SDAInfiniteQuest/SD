@@ -93,7 +93,7 @@ matrix_t circle_in_matrix(matrix_t m, circle_t c){
 
 //Allocation de circleToDraw dans create_world
 void create_world(matrix_t m,circle_t circleToDraw){
-	int nb_circle=10000;
+	int nb_circle=1000;
 	int i=0,j=0,k=0;
 	circle obs[nb_circle];
 	circle current;
@@ -105,10 +105,19 @@ void create_world(matrix_t m,circle_t circleToDraw){
 	//a randomiser par la suite
 	start.x=0;
 	start.y=height/2;
-
+  
+  for (i = 0; i < 20; i++) {
+    for (j = 0; j < 20; j++) {
+      setPoint(m,i,j);
+    }
+  }
+  i=0;
 	//a randomiser par la suite
 	end.x=length;
 	end.y=height/2;
+  
+  m->end=end;
+  m->start=start;
 
 	matrix_t tmp=m;
 	circleToDraw=malloc(nb_circle*sizeof(struct str_circle));
@@ -116,10 +125,10 @@ void create_world(matrix_t m,circle_t circleToDraw){
 	while(i<nb_circle){
 		current.center.x=rand()%length;
 		current.center.y=rand()%height;
-		current.radius=1+rand()%(min(length,height)/100);
+		current.radius=1+rand()%(min(length,height)/8);
 		//printf("(%d,%d,%d)\n",current.center.x,current.center.y,current.radius);
 
-		if((distance(&current.center,&start)<=current.radius+15) || (distance(&current.center,&end)<=current.radius+15)) 
+		if((distance(&current.center,&start)<=(current.radius+15)) || (distance(&current.center,&end)<=(current.radius+15))) 
 			not_possible=TRUE;
 
 		if(i>0)
