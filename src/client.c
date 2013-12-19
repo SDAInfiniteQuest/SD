@@ -46,9 +46,13 @@ int main (int argc, char **argv) {
 	displayWorld(screen,mat);
 	SDL_Flip(screen);
 
-  scanf("%c",&choix);
   CLIENT* serv=clnt_create(argv[1],PROGNUM,VERSNUM,"tcp");
+  if(serv==NULL){
+    printf("Error create client\n");
+    exit(0);
+  }
 
+  scanf("%c",&choix);
   if(choix=='1'){
     stat = clnt_call(/* host */ serv,
         /* procnum */ PROCNUM_DISPLAY_GAME,
@@ -60,7 +64,7 @@ int main (int argc, char **argv) {
     displayWorld(screen,mat);
   }
   else if(choix=='2'){
-    stat = clnt_call(/* host */ host,
+    stat = clnt_call(/* host */ serv,
         /* procnum */ PROCNUM_DISPLAY_ADN,
         /* encodage argument */ (xdrproc_t) xdr_adn,
         /* argument */ (caddr_t)&old->a[0],
@@ -70,7 +74,7 @@ int main (int argc, char **argv) {
     displayDna(screen,old->a[0]);
   }  
   else if(choix=='3'){
-    stat = clnt_call(/* host */ host,
+    stat = clnt_call(/* host */ serv,
         /* procnum */ PROCNUM_DISPLAY_POPULATION,
         /* encodage argument */ (xdrproc_t) xdr_population,
         /* argument */ (caddr_t)&old,

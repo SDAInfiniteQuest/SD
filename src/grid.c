@@ -57,7 +57,7 @@ matrix_t circle_in_matrix(matrix_t m, circle_t c){
 	int r=c->radius;
 	int y=r;
 	int d=r-1;
-	int midPoint=5-4*y;
+	//int midPoint=5-4*y;
 	int x_center=c->center.x;
 	int y_center=c->center.y;
 	while(x<=y){
