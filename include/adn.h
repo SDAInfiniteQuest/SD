@@ -25,7 +25,7 @@
 #include "bool.h"
 #include "grid.h"
 
-#define POPULATION_SIZE 100 
+#define POPULATION_SIZE 1000 
 
 #define SOUTH 			0
 #define SOUTH_EAST 	1
