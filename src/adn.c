@@ -65,8 +65,8 @@ void recompute_adn_from_index(adn_t ind,int index){
   int i;
   
   for (i = index; i < size_adn; i++) {
-    ind->d[index]->start=ind->d[index-1]->end;
-    compute_displacement(ind->d[index],ind->d[index]->dir,ind->d[index]->length);
+    ind->d[i]->start=ind->d[i-1]->end;
+    compute_displacement(ind->d[i],ind->d[i]->dir,ind->d[i]->length);
   }
 }
 

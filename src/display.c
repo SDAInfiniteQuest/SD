@@ -71,6 +71,7 @@ void test_dessine(SDL_Surface* screen){
     putpixel(screen,i,20,0xffffff);
   }
 }
+
 void displayDisplacement (SDL_Surface *screen, displacement_t d) {
 	static Uint32 color=0x0033ff;
 

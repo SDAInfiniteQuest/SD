@@ -10,6 +10,7 @@ void growth_population(population_t pop){
 		growth(pop->a[i]);
 	}
 }
+
 bool displacement_outside(displacement_t d){
 	if(d->end.x<0 || d->end.y<0||d->start.x>GRID_SIZE||d->start.y>GRID_SIZE)
 		return FALSE;
@@ -195,7 +196,7 @@ void evaluation(adn_t ind,matrix_t m){
 	if(count_collision==0)
 		eval+=100;
 	else
-		eval-=count_collision*50;
+		eval-=count_collision*50; // modif valeur collision initialement à 50!!!!
 
 	if (adn_outside(ind)) {
 		eval-=10000;
