@@ -125,7 +125,7 @@ bool add_displacement(adn_t ind,char dir,int length){
 }
 
 void change_displacement(adn_t ind,int index){
-  point starting_point=ind->d[index]->start;
+  point starting_point=ind->d[index-1]->end;
   free(ind->d[index]);
   displacement_t new=create_displacement(starting_point,rand()%8,rand()%30);
   ind->d[index]=new;
