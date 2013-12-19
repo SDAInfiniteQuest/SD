@@ -45,6 +45,10 @@ matrix_t setPoint(matrix_t m,int x,int y){
 }
 
 int getPoint(matrix_t m,int x,int y) {
+	if(outOfBound(x,y)==TRUE) {
+		fprintf(stderr, "erreur getPoint: x=%d, y=%d sont invalides\n", x, y);
+		exit(EXIT_FAILURE);
+	}
 	return m->m[y*m->nb_columns+x];
 }
 

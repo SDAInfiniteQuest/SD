@@ -27,11 +27,9 @@ bool adn_outside(adn_t ind){
 }
 
 // une jolie SEG_FAULT :)
-// ca doit etre du a un appel impossible sur getPoint (out of bound
-// blablabla)
+// appel impossible sur getPoint (out of bound blablabla)
 bool test_displacement(displacement_t d,matrix_t m){
 	bool retVal=TRUE;
-	printf("test_displacment entree\n");
 	int startX=d->start.x;
 	int startY=d->start.y;
 	int length=d->length;
@@ -39,11 +37,9 @@ bool test_displacement(displacement_t d,matrix_t m){
 	//bool tricky_case=FALSE;
 	int i;
 
-
-	if(d->start.x<0 || d->start.y<0)
-		return FALSE;
-	if(d->end.x>GRID_SIZE || d->end.y>GRID_SIZE)
-		return FALSE;
+	if((d->start.x<0 || d->start.y<0) ||
+		(d->end.x>GRID_SIZE || d->end.y>GRID_SIZE))
+			retVal==FALSE;
 
 	switch(dir) {
 		case SOUTH:
@@ -222,7 +218,6 @@ bool test_displacement(displacement_t d,matrix_t m){
 			}
 		}
 	}*/
-	printf("test_displacment sortie\n");
 	return retVal;
 }
 
