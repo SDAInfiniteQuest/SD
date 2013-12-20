@@ -4,6 +4,7 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netdb.h>
+#include <unistd.h>
 
 CLIENT* connect_clnt(char* host,unsigned int prognum,unsigned versnum){
   unsigned int server_plage=0x20050000;
@@ -63,10 +64,10 @@ int main (int argc, char **argv) {
   enum clnt_stat stat;
   int i,j,k;
   void* res;
-  char choix;
   void* pNULL=NULL;
   static struct timeval TIMEOUT={10000,0};
   population_t* population=malloc(sizeof(population_t)*nb_server);
+  population_t elite=create_population(100);
 
   srand(time(NULL));
   circle_t circle=NULL;
@@ -116,35 +117,55 @@ int main (int argc, char **argv) {
         /* retour de la fonction distante */(caddr_t)&res,
         /*timeout*/TIMEOUT);
   }
-  
-  /*Tous les serveur calcul des chemin*/
-  #pragma omp parallel for private(j)
-  for (i = 0; i < nb_server; i++) {
-    for (j = 0; j <5; j++) {
-      stat = clnt_call(/* host */ list_server[i],
-          /* procnum */ PROCNUM_GENETIC,
-          /* encodage argument */ (xdrproc_t) xdr_void,
-          /* argument */ (caddr_t)pNULL,
-          /* decodage retour */ (xdrproc_t)xdr_population,
-          /* retour de la fonction distante */(caddr_t)&population[i],
-          /*timeout*/TIMEOUT);
 
-      for (k = 0; k < 10; k++) {
-        displayDna(screen,population[i]->a[k]);
-        printf("test\n");
+  while(1){
+    
+    for (i = 0; i < elite->nb_adn; i++) {
+      freeDna(elite->a[i]);
+    }
+    flush_population(elite);
+
+    /*Tous les serveur calcul des chemin*/
+    #pragma omp parallel for private(k)
+    for (i = 0; i < nb_server; i++) {
+        stat = clnt_call(/* host */ list_server[i],
+            /* procnum */ PROCNUM_GENETIC,
+            /* encodage argument */ (xdrproc_t) xdr_void,
+            /* argument */ (caddr_t)pNULL,
+            /* decodage retour */ (xdrproc_t)xdr_population,
+            /* retour de la fonction distante */(caddr_t)&population[i],
+            /*timeout*/TIMEOUT);
+
+        for (k = 0; k < 10; k++) {
+          displayDna(screen,population[i]->a[k]);
+          printf("test\n");
+        }
+        SDL_Flip(screen);
+    }
+
+    /*Selection des 100 meilleurs de toute les populations*/
+    quicksort_mult_population(elite,population,nb_server,elite->size);
+    
+    if(nb_server>1){
+    #pragma omp parallel for 
+      for (i = 0; i < nb_server; i++) {
+        /*Envoi des elite vers toute les serveur*/
+        stat = clnt_call(/* host */ list_server[i],
+            /* procnum */ PROCNUM_GET_OTHER,
+            /* encodage argument */ (xdrproc_t) xdr_population,
+            /* argument */ (caddr_t)&elite,
+            /* decodage retour */ (xdrproc_t)xdr_void,
+            /* retour de la fonction distante */(caddr_t)&res,
+            /*timeout*/TIMEOUT);
       }
+    }
+    if (stat != RPC_SUCCESS) { 
+      fprintf(stderr, "Echec de l'appel distant\n");
+      clnt_perrno(stat);      fprintf(stderr, "\n");
+    }
+    else{
       SDL_Flip(screen);
     }
   }
-
-  if (stat != RPC_SUCCESS) { 
-    fprintf(stderr, "Echec de l'appel distant\n");
-    clnt_perrno(stat);      fprintf(stderr, "\n");
-  }
-  else{
-    SDL_Flip(screen);
-    pause();
-  }
-
   return(0);
 }

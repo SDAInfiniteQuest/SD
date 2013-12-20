@@ -1,27 +1,26 @@
 #include "quicksort.h"
 
 //quicksort les element de old+new dans selected 
-void quicksort_mult_population(population_t elite,population_t* pop,int nb_pop){
+void quicksort_mult_population(population_t elite,population_t* pop,int nb_pop,int population_size){
   static population_t selected=NULL;
   int i,j;
   int current;
-  adn_t new ;
 
   if (selected==NULL) {
-    selected=create_population(nb_pop*POPULATION_SIZE);
+    selected=create_population(nb_pop*population_size);
   }
   flush_population(selected);
 
   for (i = 0; i < nb_pop; i++) {
-    for (j = 0; j < POPULATION_SIZE; j++) {
+    for (j = 0; j < population_size; j++) {
       population_add(pop[i]->a[j],selected);
     }
   }
   
-  quicksort(selected,0,nb_pop*POPULATION_SIZE-1);
+  quicksort(selected,0,nb_pop*population_size-1);
   
   for (i = 0; i < elite->size; i++) {
-    current=(POPULATION_SIZE*nb_pop)-1-i;
+    current=(population_size*nb_pop)-1-i;
     population_add(copy_adn(selected->a[current]),elite);
   }
 }

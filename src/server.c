@@ -8,13 +8,15 @@ int NB_THREADS;
 matrix_t mat;
 population_t* old;
 population_t* new;
-population_t elite; //les 100 meilleurs de chaque sous-population 
+population_t elite_local;   //les 100 meilleurs de chaque sous-population 
+population_t elite_remote;  //les 100 meilleurs des autre serveurs confondu
 
 void set_nb_threads(int nb_threads){
   NB_THREADS=nb_threads;
   old=malloc(sizeof(population_t)*nb_threads);
   new=malloc(sizeof(population_t)*nb_threads);
-  elite=create_population(100);
+  elite_local=create_population(100);
+  elite_remote=NULL;
 }
 
 
@@ -48,10 +50,10 @@ void* get_matrix(matrix_t m){
 population_t* genetic_wrapper(){
   int i,j;
 
-  for (i = 0; i < elite->nb_adn; i++) {
-    freeDna(elite->a[i]);
+  for (i = 0; i < elite_local->nb_adn; i++) {
+    freeDna(elite_local->a[i]);
   }
-  flush_population(elite);
+  flush_population(elite_local);
 
   #pragma omp parallel for schedule(dynamic,1) private(j)
   for (i = 0; i < NB_THREADS; i++) {
@@ -61,20 +63,22 @@ population_t* genetic_wrapper(){
     }
   }
   
-    quicksort_mult_population(elite,old,NB_THREADS);
+    quicksort_mult_population(elite_local,old,NB_THREADS,POPULATION_SIZE);
     if(NB_THREADS>1){
       for (i = 0; i < NB_THREADS; i++) {
-        add_population_to_tail(old[i],elite);
+        add_population_to_tail(old[i],elite_local);
       }
     }
     
-  return &elite;
+  return &elite_local;
 }
 
 
 void dispatch(struct svc_req* req,SVCXPRT* svc){
 
   switch(req->rq_proc){
+    int i;
+
     case PROCNUM_GET_MATRIX:
       printf("Reception de la matrice et initialisation\n");
       if (!svc_getargs(svc,(xdrproc_t) xdr_matrix,(caddr_t) &mat)) {
@@ -87,8 +91,24 @@ void dispatch(struct svc_req* req,SVCXPRT* svc){
     case PROCNUM_GENETIC:
       genetic_wrapper();
       printf("fin calcul\n");
-      if (!svc_sendreply(svc,(xdrproc_t) xdr_population,(caddr_t) &elite)) printf("Erreur traitement call RPC\n");
+      if (!svc_sendreply(svc,(xdrproc_t) xdr_population,(caddr_t) &elite_local)) printf("Erreur traitement call RPC\n");
       break;
+    case PROCNUM_GET_OTHER:
+      if(elite_remote!=NULL){
+        freePopulation(elite_remote);
+      }
+
+      if (!svc_getargs(svc,(xdrproc_t) xdr_population,(caddr_t) &elite_remote)) {
+        svcerr_decode(svc);
+        break;
+      }
+      
+      #pragma omp parallel for
+      for (i = 0; i < NB_THREADS; i++) {
+        add_population_to_tail(new[i],elite_remote);
+      }
+
+      if (!svc_sendreply(svc,(xdrproc_t) xdr_void,(caddr_t) 0)) printf("Erreur traitement call RPC\n");
     default:
       svcerr_noproc(svc);
       break;
@@ -117,10 +137,10 @@ int main (int argc,char** argv) {
      /* pointeur sur dispatch */  dispatch,
      /* Protocol */ IPPROTO_TCP);
   
-  //if (stat != 1) {
-  //  fprintf(stderr,"Echec de l'enregistrement du dispatcher\n");
-  //  exit(1);
-  //}
+  if (stat != 1) {
+    fprintf(stderr,"Echec de l'enregistrement du dispatcher\n");
+    exit(1);
+  }
 
   svc_run(); /* le serveur est en attente de clients eventuels */
   return(0); /* on y passe jamais ! */
