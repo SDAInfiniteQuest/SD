@@ -1,4 +1,6 @@
 #include "genetic.h"
+#include <omp.h>
+#include <pthread.h>
 
 void growth(adn_t a){
 	while(!add_displacement(a,rand()%8,1+rand()%20)){}
@@ -105,7 +107,7 @@ int test_ADN(adn_t ind,matrix_t m){
 	return count_collision;
 }
 
-//Enjambement a 30%
+//Enjambement a 360%
 adn_t crossing_over(adn_t A,adn_t B){
 	int size_A=A->nb_displacement;
 	int size_B=B->nb_displacement;
@@ -176,14 +178,16 @@ void crossing_from_population(population_t old,population_t new){
 		population_add(crossing_over(old->a[i],old->a[(POPULATION_SIZE-1)-i]),new);
 	}
 
-	while(cont){
-		index_random1=rand()%POPULATION_SIZE;
-		index_random2=rand()%POPULATION_SIZE;
+  if(new->nb_adn<new->size){
+    while(cont){
+      index_random1=rand()%POPULATION_SIZE;
+      index_random2=rand()%POPULATION_SIZE;
 
-		if(!population_add(crossing_over(old->a[index_random1],old->a[index_random2]),new)){
-			cont=FALSE;
-		}
-	}
+      if(!population_add(crossing_over(old->a[index_random1],old->a[index_random2]),new)){
+        cont=FALSE;
+      }
+    }
+  }
 }
 
 void evaluation(adn_t ind,matrix_t m){
@@ -214,13 +218,14 @@ void evaluation(adn_t ind,matrix_t m){
 }
 void evaluate_population(population_t pop,matrix_t m){
 	int i;
-	for (i = 0; i < pop->nb_adn; i++) {
+	#pragma omp parallel for
+  for (i = 0; i < pop->nb_adn; i++) {
 		evaluation(pop->a[i],m);
 	}
 }
 
 void selection(population_t old,population_t new,matrix_t m){
-	static population_t selected;
+	population_t selected=NULL;
 	int i; 
 	if(selected==NULL)
 		selected=create_population(POPULATION_SIZE*2);
@@ -243,7 +248,9 @@ void selection(population_t old,population_t new,matrix_t m){
 	for (i = 0; i < POPULATION_SIZE; i++) {
     freeDna(selected->a[i]);
   }
-
+  
+  free(selected->a);
+  free(selected);
 }
 
 //mutation aleatoire de l'ordre de 1%

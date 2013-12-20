@@ -8,13 +8,13 @@ int NB_THREADS;
 matrix_t mat;
 population_t* old;
 population_t* new;
-population_t elite; //les dix meilleurs
+population_t elite; //les 100 meilleurs de chaque sous-population 
 
 void set_nb_threads(int nb_threads){
   NB_THREADS=nb_threads;
   old=malloc(sizeof(population_t)*nb_threads);
   new=malloc(sizeof(population_t)*nb_threads);
-  elite=create_population(10);
+  elite=create_population(100);
 }
 
 
@@ -99,7 +99,7 @@ void dispatch(struct svc_req* req,SVCXPRT* svc){
 int main (void) {
   bool_t stat;
   unsigned int calm=1000000;
-  set_nb_threads(2);
+  set_nb_threads(4);
   srand(time(NULL));
 
   SVCXPRT *serv=NULL;

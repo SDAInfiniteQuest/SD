@@ -27,7 +27,7 @@
 
 #define POPULATION_SIZE 500 
 #define NB_DISPLACEMENT 100
-#define NB_GENERATION 50
+#define NB_GENERATION 500
 
 #define SOUTH 			0
 #define SOUTH_EAST 	1

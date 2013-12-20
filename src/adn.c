@@ -1,4 +1,5 @@
 #include "adn.h"
+#include <pthread.h>
 displacement_t create_displacement(point start,char dir,int length){
   displacement_t d=malloc(sizeof(struct str_displacement));
   d->start=(point)start;
@@ -95,13 +96,13 @@ void recompute_adn(adn_t ind){
 
 adn_t create_ADN(){
   adn_t new=malloc(sizeof(struct str_adn));
-  new->d=malloc(sizeof(displacement_t)*100);
+  new->d=malloc(sizeof(displacement_t)*150);
   point start;
   start.x=0;
   start.y=GRID_SIZE/2;
   new->d[0]=create_displacement(start,0,0);
   new->path_length=0;
-  new->size=100;
+  new->size=150;
   new->nb_displacement=1;
   new->note=0;
   return new;
