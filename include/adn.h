@@ -25,9 +25,9 @@
 #include "bool.h"
 #include "grid.h"
 
-#define POPULATION_SIZE 1000 
+#define POPULATION_SIZE 500 
 #define NB_DISPLACEMENT 100
-#define NB_GENERATION 1000
+#define NB_GENERATION 50
 
 #define SOUTH 			0
 #define SOUTH_EAST 	1
@@ -74,5 +74,6 @@ void freeDna(adn_t a);
 void freeDisplacement(displacement_t d);
 void freePopulation(population_t p);
 adn_t alloc_adn(int nb_displacement,int size,double path_length,double note);
-
+void add_population_to_tail(population_t pop,population_t to_add);
+adn_t copy_adn(adn_t ind);
 #endif

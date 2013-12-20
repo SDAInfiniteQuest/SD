@@ -12,6 +12,9 @@ int main (int argc, char **argv) {
   int i;
   void* res;
   char choix;
+  void* pNULL=NULL;
+  population_t population;
+
   srand(time(NULL));
   circle_t circle=NULL;
   if (argc!=2) {
@@ -19,21 +22,12 @@ int main (int argc, char **argv) {
   }
 
   static struct timeval TIMEOUT={10000,0};
-  population_t old=create_population(POPULATION_SIZE);
-  population_t new=create_population(POPULATION_SIZE);
 
   matrix_t mat=init_matrix(GRID_SIZE,GRID_SIZE);
   srand(time(NULL));
 
   create_world(mat,circle);
 
-  init_population(old);
-  init_population(new);
-
-  for (i = 0; i < 50; i++) {
-    growth_population(old);
-    growth_population(new);
-  }
 
   SDL_Surface *screen;
   if(SDL_Init(SDL_INIT_VIDEO) == -1) {
@@ -65,7 +59,7 @@ int main (int argc, char **argv) {
   hints.ai_protocol=0;
   hints.ai_flags=AI_V4MAPPED | AI_ADDRCONFIG;
 
-  if(codeError=getaddrinfo(host,NULL,&hints,&infoAddr))
+  if((codeError=getaddrinfo(host,NULL,&hints,&infoAddr)))
   {
     fprintf(stderr,"%s\n",gai_strerror(codeError));
     exit(EXIT_FAILURE);
@@ -74,11 +68,11 @@ int main (int argc, char **argv) {
   toFree=infoAddr;
   while((infoAddr!=NULL)&&(infoAddr->ai_family!=AF_INET))
     infoAddr=infoAddr->ai_next;//Tant qu'on a pas trouvé d'adresse en IPv4,on prend la prochaine
-    if(infoAddr == NULL)
-    {
-      fprintf(stderr,"Addresse non correcte, host non trouve\n");
-      exit(EXIT_FAILURE);
-    }
+  if(infoAddr == NULL)
+  {
+    fprintf(stderr,"Addresse non correcte, host non trouve\n");
+    exit(EXIT_FAILURE);
+  }
 
 
   //on crée un connexion client vers le serveur en TCP
@@ -97,54 +91,29 @@ int main (int argc, char **argv) {
     printf("Error create client\n");
     exit(0);
   }
-  adn_t test=create_ADN();
-  add_displacement(test,1,10);
-  add_displacement(test,1,10);
-  add_displacement(test,1,10);
-  add_displacement(test,1,10);
-  add_displacement(test,1,10);
-  add_displacement(test,3,10);
-  add_displacement(test,3,10);
-  add_displacement(test,3,10);
-  add_displacement(test,3,10);
-  add_displacement(test,3,10);
-  scanf("%c",&choix);
-  if(choix=='1'){
+
+  stat = clnt_call(/* host */ serv,
+      /* procnum */ PROCNUM_GET_MATRIX,
+      /* encodage argument */ (xdrproc_t) xdr_matrix,
+      /* argument */ (caddr_t)&mat,
+      /* decodage retour */ (xdrproc_t)xdr_void,
+      /* retour de la fonction distante */(caddr_t)&res,
+      /*timeout*/TIMEOUT);
+  int k;
+  for (k = 0; k <10; k++) {
     stat = clnt_call(/* host */ serv,
-        /* procnum */ PROCNUM_DISPLAY_GAME,
-        /* encodage argument */ (xdrproc_t) xdr_matrix,
-        /* argument */ (caddr_t)&mat,
-        /* decodage retour */ (xdrproc_t)xdr_void,
-        /* retour de la fonction distante */(caddr_t)&res,
+        /* procnum */ PROCNUM_GENETIC,
+        /* encodage argument */ (xdrproc_t) xdr_void,
+        /* argument */ (caddr_t)pNULL,
+        /* decodage retour */ (xdrproc_t)xdr_population,
+        /* retour de la fonction distante */(caddr_t)&population,
         /*timeout*/TIMEOUT);
-    displayWorld(screen,mat);
-  }
-  else if(choix=='2'){
-    displayDna(screen,test);
-    SDL_Flip(screen);
-    stat = clnt_call(/* host */ serv,
-        /* procnum */ PROCNUM_DISPLAY_ADN,
-        /* encodage argument */ (xdrproc_t) xdr_adn,
-        /* argument */ (caddr_t)&test,
-        /* decodage retour */ (xdrproc_t)xdr_void,
-        /* retour de la fonction distante */(caddr_t)&res,
-        /*timeout*/TIMEOUT);
-    displayDna(screen,old->a[0]);
-    SDL_Flip(screen);
-  }  
-  else if(choix=='3'){
-    for (i = 0; i < POPULATION_SIZE; i++) {
-      displayDna(screen,old->a[i]);
+
+    for (i = 0; i < population->nb_adn; i++) {
+      displayDna(screen,population->a[i]);
       printf("test\n");
     }
     SDL_Flip(screen);
-    stat = clnt_call(/* host */ serv,
-        /* procnum */ PROCNUM_DISPLAY_POPULATION,
-        /* encodage argument */ (xdrproc_t) xdr_population,
-        /* argument */ (caddr_t)&old,
-        /* decodage retour */ (xdrproc_t)xdr_void,
-        /* retour de la fonction distante */(caddr_t)&res,
-        /*timeout*/TIMEOUT);
   }
 
   if (stat != RPC_SUCCESS) { 

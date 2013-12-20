@@ -241,8 +241,8 @@ void selection(population_t old,population_t new,matrix_t m){
 
 	//free tout les individu "mauvais", la moitie restante de selected
 	for (i = 0; i < POPULATION_SIZE; i++) {
-		freeDna(selected->a[i]);
-	}
+    freeDna(selected->a[i]);
+  }
 
 }
 

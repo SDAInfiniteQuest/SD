@@ -19,7 +19,16 @@ adn_t alloc_adn(int nb_displacement,int size,double path_length,double note){
   
   return new;
 }
+adn_t copy_adn(adn_t ind){
+  int i;
+  adn_t new=create_ADN();
+  
+  for (i = 1; i < ind->nb_displacement; i++) {
+    add_displacement(new,ind->d[i]->dir,ind->d[i]->length);
+  }
 
+  return new;
+}
 void compute_displacement(displacement_t dis,char dir,int length){
   point start=dis->start;
   point* end=&dis->end;
@@ -132,6 +141,21 @@ void change_displacement(adn_t ind,int index){
   displacement_t new=create_displacement(starting_point,rand()%8,rand()%30);
   ind->d[index]=new;
   recompute_adn_from_index(ind,index);
+}
+
+void add_population_to_tail(population_t pop,population_t to_add){
+  int i;
+  adn_t new;
+
+  for(i=0;i<to_add->nb_adn;i++){
+    freeDna(pop->a[(POPULATION_SIZE-1)-i]);
+  }
+  pop->nb_adn-=to_add->nb_adn;
+
+  for(i=0;i<to_add->nb_adn;i++){
+    new=copy_adn(to_add->a[i]);
+    population_add(new,pop);
+  }
 }
 
 

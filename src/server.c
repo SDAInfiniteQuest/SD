@@ -1,103 +1,93 @@
 #include "include.h"
 #include "xdr_struct.h"
 #include "display.h"
-void* affiche_jeu(matrix_t m){
+#include <omp.h>
+#include <pthread.h>
 
-  SDL_Surface *screen;
-	if(SDL_Init(SDL_INIT_VIDEO) == -1) {
-		fprintf(stderr, "impossible de lancer la sdl: %s\n",SDL_GetError());
-		exit(EXIT_FAILURE);
-	}
+int NB_THREADS;
+matrix_t mat;
+population_t* old;
+population_t* new;
+population_t elite; //les dix meilleurs
 
-	if((screen=SDL_SetVideoMode((m)->nb_columns,(m)->nb_rows,32,SDL_ANYFORMAT | SDL_DOUBLEBUF | SDL_HWSURFACE))==NULL) {
-		fprintf(stderr, "erreur SDL %s\n", SDL_GetError());
-		exit(EXIT_FAILURE);
-	}
-
-  SDL_WM_SetCaption("World and best path", NULL);
-
-	displayWorld(screen,m);
-	SDL_Flip(screen);
-	pause();
-  
-  return NULL;
+void set_nb_threads(int nb_threads){
+  NB_THREADS=nb_threads;
+  old=malloc(sizeof(population_t)*nb_threads);
+  new=malloc(sizeof(population_t)*nb_threads);
+  elite=create_population(10);
 }
 
-void* affiche_adn(adn_t ind){
-  
-  SDL_Surface *screen;
-	if(SDL_Init(SDL_INIT_VIDEO) == -1) {
-		fprintf(stderr, "impossible de lancer la sdl: %s\n",SDL_GetError());
-		exit(EXIT_FAILURE);
-	}
 
-	if((screen=SDL_SetVideoMode(GRID_SIZE,GRID_SIZE,32,SDL_ANYFORMAT | SDL_DOUBLEBUF | SDL_HWSURFACE))==NULL) {
-		fprintf(stderr, "erreur SDL %s\n", SDL_GetError());
-		exit(EXIT_FAILURE);
-	}
 
-  SDL_WM_SetCaption("World and best path", NULL);
-
-	displayDna(screen, ind);
-	SDL_Flip(screen);
-	pause();
-
-  return NULL;
-}
-
-void* affiche_population(population_t pop){
+//initialise une population
+void set_genetic(int index){
   int i;
-  SDL_Surface *screen;
-	if(SDL_Init(SDL_INIT_VIDEO) == -1) {
-		fprintf(stderr, "impossible de lancer la sdl: %s\n",SDL_GetError());
-		exit(EXIT_FAILURE);
-	}
+  old[index]=create_population(POPULATION_SIZE);
+  new[index]=create_population(POPULATION_SIZE);
 
-	if((screen=SDL_SetVideoMode(GRID_SIZE,GRID_SIZE,32,SDL_ANYFORMAT | SDL_DOUBLEBUF | SDL_HWSURFACE))==NULL) {
-		fprintf(stderr, "erreur SDL %s\n", SDL_GetError());
-		exit(EXIT_FAILURE);
-	}
+  init_population(old[index]);
+  init_population(new[index]);
 
-  SDL_WM_SetCaption("World and best path", NULL);
-  for (i = 0; i < (pop)->nb_adn; i++) {
-	  displayDna(screen, (pop)->a[i]);
+  for (i = 0; i < NB_DISPLACEMENT; i++) {
+    growth_population(old[index]);
+    growth_population(new[index]);
   }
-	SDL_Flip(screen);
-	pause();
+}
+
+//recupere la matrix du client et initialise toute les population
+void* get_matrix(matrix_t m){
+  int i;
+  mat=m;
+  
+  for (i = 0; i < NB_THREADS; i++) {
+    set_genetic(i);
+  }
   return NULL;
+}
+
+population_t* genetic_wrapper(){
+  int i,j;
+
+  for (i = 0; i < elite->nb_adn; i++) {
+    freeDna(elite->a[i]);
+  }
+  flush_population(elite);
+
+  #pragma omp parallel for schedule(dynamic,1)
+  for (i = 0; i < NB_THREADS; i++) {
+    printf("%d\n",omp_get_thread_num());
+    for (j = 0; j < NB_GENERATION; j++) {
+      genetic(mat,old[i],new[i]);
+    }
+  }
+  
+    quicksort_mult_population(elite,old,NB_THREADS);
+    if(NB_THREADS>1){
+      for (i = 0; i < NB_THREADS; i++) {
+        add_population_to_tail(old[i],elite);
+      }
+    }
+    
+  return &elite;
 }
 
 
 void dispatch(struct svc_req* req,SVCXPRT* svc){
-  matrix_t m;
-  adn_t a;
-  population_t pop;
 
   switch(req->rq_proc){
-    case PROCNUM_DISPLAY_GAME:
-      printf("Game display\n");
-      if (!svc_getargs(svc,(xdrproc_t) xdr_matrix,(caddr_t) &m)) {
+    case PROCNUM_GET_MATRIX:
+      printf("Reception de la matrice et initialisation\n");
+      if (!svc_getargs(svc,(xdrproc_t) xdr_matrix,(caddr_t) &mat)) {
         svcerr_decode(svc);
         break;
       }
-      affiche_jeu(m);
+      get_matrix(mat);
       if (!svc_sendreply(svc,(xdrproc_t) xdr_void,(caddr_t) 0)) printf("Erreur traitement call RPC\n");
       break;
-    case PROCNUM_DISPLAY_ADN:
-      if (!svc_getargs(svc,(xdrproc_t) xdr_adn,(caddr_t) &a)) {
-        svcerr_decode(svc);
-        break;
-      }
-      affiche_adn(a);
-      if (!svc_sendreply(svc,(xdrproc_t) xdr_void,(caddr_t) 0)) printf("Erreur traitement call RPC\n");
-      break;
-    case PROCNUM_DISPLAY_POPULATION:
-      if (!svc_getargs(svc,(xdrproc_t) xdr_population,(caddr_t) &pop)) {
-        svcerr_decode(svc);
-        break;
-      }
-      affiche_population(pop);
-      if (!svc_sendreply(svc,(xdrproc_t) xdr_void,(caddr_t) 0)) printf("Erreur traitement call RPC\n");
+    case PROCNUM_GENETIC:
+      genetic_wrapper();
+      printf("fin calcul\n");
+      if (!svc_sendreply(svc,(xdrproc_t) xdr_population,(caddr_t) &elite)) printf("Erreur traitement call RPC\n");
       break;
     default:
       svcerr_noproc(svc);
@@ -108,17 +98,17 @@ void dispatch(struct svc_req* req,SVCXPRT* svc){
 
 int main (void) {
   bool_t stat;
-  int sock=RPC_ANYSOCK;
-  unsigned int max_size=sizeof(struct str_adn)*POPULATION_SIZE*sizeof(struct str_displacement)*(NB_DISPLACEMENT+1)+sizeof(struct str_population);
   unsigned int calm=1000000;
+  set_nb_threads(2);
+  srand(time(NULL));
 
   SVCXPRT *serv=NULL;
   if((serv=svctcp_create(RPC_ANYSOCK,calm,calm))==NULL)
     printf("Error creation serveur\n");
 
 
-pmap_unset(PROGNUM,VERSNUM);
-stat = svc_register(serv,
+  pmap_unset(PROGNUM,VERSNUM);
+  stat = svc_register(serv,
      /* prognum */ PROGNUM,
      /* versnum */ VERSNUM,
      /* pointeur sur dispatch */  dispatch,

@@ -3,9 +3,9 @@
 
 
 bool_t xdr_matrix(XDR *xdrs,matrix_t* e){
-  int i,j;
   int length;
   int height;
+  point start,end;
   matrix_t m;
 
   if (xdrs->x_op==XDR_ENCODE){
@@ -18,14 +18,22 @@ bool_t xdr_matrix(XDR *xdrs,matrix_t* e){
     printf("test\n");
     if(xdr_int(xdrs,&height)!=TRUE)
       return FALSE;
+    if(xdr_point(xdrs,&m->start)!=TRUE)
+      return FALSE;
+    if(xdr_point(xdrs,&m->end)!=TRUE)
+      return FALSE;
   }else if (xdrs->x_op==XDR_DECODE){
     if(xdr_int(xdrs,&length)!=TRUE)
       return FALSE;
     if(xdr_int(xdrs,&height)!=TRUE)
       return FALSE;
-    printf("%d\n",length);
-    printf("%d\n",height);
+    if(xdr_point(xdrs,&start)!=TRUE)
+      return FALSE;
+    if(xdr_point(xdrs,&end)!=TRUE)
+      return FALSE;
     m=init_matrix(length,height);
+    m->start=start;
+    m->end=end;
     (*e)=m;
   }
 
@@ -132,6 +140,7 @@ bool_t xdr_adn(XDR *xdrs,adn_t* ind) {
 bool_t xdr_population(XDR *xdrs,population_t* pop) {
   population_t tmp;
   int nb_adn;
+  int size;
   int i;
 
   if (xdrs->x_op==XDR_ENCODE){
@@ -139,13 +148,19 @@ bool_t xdr_population(XDR *xdrs,population_t* pop) {
 
     if(xdr_int(xdrs,&tmp->nb_adn)!=TRUE)
       return FALSE;
+    
+    if(xdr_int(xdrs,&tmp->size)!=TRUE)
+      return FALSE;
 
   }else if (xdrs->x_op==XDR_DECODE){
     
     if(xdr_int(xdrs,&nb_adn)!=TRUE)
       return FALSE;
+    
+    if(xdr_int(xdrs,&size)!=TRUE)
+      return FALSE;
      
-    tmp=create_population(POPULATION_SIZE);
+    tmp=create_population(size);
     tmp->nb_adn=nb_adn;
    (*pop)=tmp;
   }
