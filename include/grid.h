@@ -5,6 +5,8 @@
 #include <assert.h>
 #include <stdlib.h>
 #include <math.h>
+#include <rpc/types.h>
+#include "grid.h"
 #include "bool.h"
 
 #define GRID_SIZE 840

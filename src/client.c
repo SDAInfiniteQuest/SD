@@ -5,46 +5,8 @@
 #include <sys/socket.h>
 #include <netdb.h>
 
-
-int main (int argc, char **argv) {
-  char *host = argv[1];
-  enum clnt_stat stat;
-  int i;
-  void* res;
-  char choix;
-  void* pNULL=NULL;
-  population_t population;
-
-  srand(time(NULL));
-  circle_t circle=NULL;
-  if (argc!=2) {
-    printf("Usage :%s [IP serveur]\n",argv[0]);
-  }
-
-  static struct timeval TIMEOUT={10000,0};
-
-  matrix_t mat=init_matrix(GRID_SIZE,GRID_SIZE);
-  srand(time(NULL));
-
-  create_world(mat,circle);
-
-
-  SDL_Surface *screen;
-  if(SDL_Init(SDL_INIT_VIDEO) == -1) {
-    fprintf(stderr, "impossible de lancer la sdl: %s\n",SDL_GetError());
-    exit(EXIT_FAILURE);
-  }
-
-  if((screen=SDL_SetVideoMode(mat->nb_columns,mat->nb_rows,32,SDL_ANYFORMAT | SDL_DOUBLEBUF | SDL_HWSURFACE))==NULL) {
-    fprintf(stderr, "erreur SDL %s\n", SDL_GetError());
-    exit(EXIT_FAILURE);
-  }
-
-  SDL_WM_SetCaption("World and best path", NULL);
-
-  displayWorld(screen,mat);
-  SDL_Flip(screen);
-
+CLIENT* connect_clnt(char* host,unsigned int prognum,unsigned versnum){
+  unsigned int server_plage=0x20050000;
   int codeError=0;
   int sock=RPC_ANYSOCK;
   struct addrinfo *infoAddr= NULL;
@@ -75,45 +37,104 @@ int main (int argc, char **argv) {
   }
 
 
+  printf("prognum %u\n",prognum+server_plage+1);
   //on crée un connexion client vers le serveur en TCP
   server_addr.sin_addr=((struct sockaddr_in *)infoAddr->ai_addr)->sin_addr;
   server_addr.sin_family = AF_INET;
   server_addr.sin_port = 0;
-  if ((serv = clnttcp_create(&server_addr,PROGNUM, VERSNUM,&sock,10000,10000)) == NULL)
+  if ((serv = clnttcp_create(&server_addr,server_plage+prognum+1, versnum+1,&sock,10000,10000)) == NULL)
   {
     clnt_pcreateerror("clnttcp_create");
     exit(-1);
   }
   freeaddrinfo(toFree);
 
-
   if(serv==NULL){
     printf("Error create client\n");
     exit(0);
   }
+  return serv;
+}
 
-  stat = clnt_call(/* host */ serv,
-      /* procnum */ PROCNUM_GET_MATRIX,
-      /* encodage argument */ (xdrproc_t) xdr_matrix,
-      /* argument */ (caddr_t)&mat,
-      /* decodage retour */ (xdrproc_t)xdr_void,
-      /* retour de la fonction distante */(caddr_t)&res,
-      /*timeout*/TIMEOUT);
-  int k;
-  for (k = 0; k <10; k++) {
-    stat = clnt_call(/* host */ serv,
-        /* procnum */ PROCNUM_GENETIC,
-        /* encodage argument */ (xdrproc_t) xdr_void,
-        /* argument */ (caddr_t)pNULL,
-        /* decodage retour */ (xdrproc_t)xdr_population,
-        /* retour de la fonction distante */(caddr_t)&population,
+int main (int argc, char **argv) {
+  char *host = argv[1];
+  int nb_server=atoi(argv[2]);
+  CLIENT** list_server=malloc(sizeof(CLIENT*)*nb_server);
+  enum clnt_stat stat;
+  int i,j,k;
+  void* res;
+  char choix;
+  void* pNULL=NULL;
+  static struct timeval TIMEOUT={10000,0};
+  population_t* population=malloc(sizeof(population_t)*nb_server);
+
+  srand(time(NULL));
+  circle_t circle=NULL;
+  if (argc!=2) {
+    printf("Usage :%s [IP serveur] [nb_serveur dispo]\n",argv[0]);
+  }
+
+
+  matrix_t mat=init_matrix(GRID_SIZE,GRID_SIZE);
+  srand(time(NULL));
+
+  create_world(mat,circle);
+
+
+  SDL_Surface *screen;
+  if(SDL_Init(SDL_INIT_VIDEO) == -1) {
+    fprintf(stderr, "impossible de lancer la sdl: %s\n",SDL_GetError());
+    exit(EXIT_FAILURE);
+  }
+
+  if((screen=SDL_SetVideoMode(mat->nb_columns,mat->nb_rows,32,SDL_ANYFORMAT | SDL_DOUBLEBUF | SDL_HWSURFACE))==NULL) {
+    fprintf(stderr, "erreur SDL %s\n", SDL_GetError());
+    exit(EXIT_FAILURE);
+  }
+
+  SDL_WM_SetCaption("World and best path", NULL);
+
+  displayWorld(screen,mat);
+  SDL_Flip(screen);
+
+
+
+  /*On se connect a tous les serveur*/
+  //#pragma omp parallel for
+  for (i = 0; i < nb_server; i++) {
+    list_server[i]=connect_clnt(host,i,i);
+  }
+
+  /*Tous les serveur recupere la matrice du jeu et s'initialise*/
+  #pragma omp parallel for
+  for (i = 0; i < nb_server; i++) {
+    stat = clnt_call(/* host */ list_server[i],
+        /* procnum */ PROCNUM_GET_MATRIX,
+        /* encodage argument */ (xdrproc_t) xdr_matrix,
+        /* argument */ (caddr_t)&mat,
+        /* decodage retour */ (xdrproc_t)xdr_void,
+        /* retour de la fonction distante */(caddr_t)&res,
         /*timeout*/TIMEOUT);
+  }
+  
+  /*Tous les serveur calcul des chemin*/
+  #pragma omp parallel for private(j)
+  for (i = 0; i < nb_server; i++) {
+    for (j = 0; j <5; j++) {
+      stat = clnt_call(/* host */ list_server[i],
+          /* procnum */ PROCNUM_GENETIC,
+          /* encodage argument */ (xdrproc_t) xdr_void,
+          /* argument */ (caddr_t)pNULL,
+          /* decodage retour */ (xdrproc_t)xdr_population,
+          /* retour de la fonction distante */(caddr_t)&population[i],
+          /*timeout*/TIMEOUT);
 
-    for (i = 0; i < population->nb_adn; i++) {
-      displayDna(screen,population->a[i]);
-      printf("test\n");
+      for (k = 0; k < 10; k++) {
+        displayDna(screen,population[i]->a[k]);
+        printf("test\n");
+      }
+      SDL_Flip(screen);
     }
-    SDL_Flip(screen);
   }
 
   if (stat != RPC_SUCCESS) { 

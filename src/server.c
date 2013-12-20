@@ -53,7 +53,7 @@ population_t* genetic_wrapper(){
   }
   flush_population(elite);
 
-  #pragma omp parallel for schedule(dynamic,1)
+  #pragma omp parallel for schedule(dynamic,1) private(j)
   for (i = 0; i < NB_THREADS; i++) {
     printf("%d\n",omp_get_thread_num());
     for (j = 0; j < NB_GENERATION; j++) {
@@ -96,21 +96,24 @@ void dispatch(struct svc_req* req,SVCXPRT* svc){
   return;
 }
 
-int main (void) {
+int main (int argc,char** argv) {
   bool_t stat;
   unsigned int calm=1000000;
   set_nb_threads(4);
   srand(time(NULL));
-
+  unsigned int prognum=strtoul(argv[1],NULL,0);
+  unsigned int versnum=strtoul(argv[2],NULL,0);
   SVCXPRT *serv=NULL;
+
   if((serv=svctcp_create(RPC_ANYSOCK,calm,calm))==NULL)
     printf("Error creation serveur\n");
-
-
-  pmap_unset(PROGNUM,VERSNUM);
+  printf("versnum%u\n",versnum);
+  prognum+=0x20050000;
+  printf("prognum %u\n",prognum);
+  pmap_unset(prognum,versnum);
   stat = svc_register(serv,
-     /* prognum */ PROGNUM,
-     /* versnum */ VERSNUM,
+     /* prognum */ prognum,
+     /* versnum */ versnum,
      /* pointeur sur dispatch */  dispatch,
      /* Protocol */ IPPROTO_TCP);
   

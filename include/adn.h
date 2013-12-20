@@ -22,7 +22,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "bool.h"
+#include <rpc/types.h>
 #include "grid.h"
 
 #define POPULATION_SIZE 500 
