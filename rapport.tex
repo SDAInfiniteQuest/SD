@@ -1,0 +1,245 @@
+\documentclass{article}
+\usepackage[francais]{babel}
+\usepackage[utf8]{inputenc}
+\begin{document}
+
+\title{Rapport de systeme distribue}
+\author{Pallamidessi Joseph \\
+        Simon Andreux
+        }
+\maketitle
+
+\section{Intro} % (fold)
+\label{sec:Intro}
+  \paragraph{} % (fold)
+  \label{par:}
+    Le projet a ete realise en C89 standard avec les bibliotheques suivantes: rpc pour la partie
+    reseaux/distribue,SDL pour la partie graphique et openMP pour le parallelisme. Les
+    programme client et serveur compilent sans warning et n'ont aucune fuites memoires.
+  % paragraph  (end)
+% section Intro (end)
+
+\section{Mise en place} % (fold)
+
+\label{sec:Mise en place}
+  \paragraph{} % (fold)
+  \label{par:}
+    Le programme se compile en avec un simple appel a make dans le repertoire racine du
+    projet.Une commande make clean est egalement possible.\\
+    Les serveur se lance en precisant 2 argument en entree leurs procnum et leurs versnum, 
+    mais doivent etre scritement les meme,on precise aussi le nombre de threads voulu.\\
+    Le client se lance en precisant l'adresse IP (unique) des serveur et leurs nombre. \\
+    Pour lancer un run,on peut utiliser le script run fourni: "run \[nombre de serveurs voulu\]" ou
+    bien manuellement.\\
+    ex. de lancement manuelle: serveur 1 1 4& \\
+                               serveur 2 2 4& \\
+                               client localhost 2\\
+  % paragraph  (end)
+% section Mise en place (end)
+
+\section{Structure de donnee et initialisation} % (fold)
+\label{sec:Structure de donnee}
+  \paragraph{} % (fold)
+  \label{par:}
+    Les structure utilisees sont les suivantes : des population ayant des allocation dynamique
+    d'adn, ayant elles-meme des allocation dynamique de displacement. Le fait d'avoir des
+    allocation dynamique de displacement avait un sens pour gerer le croissement d'adn de
+    taille differentes.L'algorithme presente ici utilise des taille fixe.\\
+    Les displacement se font dans 8 direction et on des taille variable (de 1 a 30 pixel),
+    tous comme le parametre (#define) NB\_DISPLACEMENT renseigne le nomdre de displacement
+    utilises par adn.
+  % paragraph  (end)
+    \paragraph{paragraph name} % (fold)
+    \label{par:paragraph name}
+      Le "monde" est une matrice represente de maniere lineaire en memoire pour facilite
+      sont transfert.
+    % paragraph paragraph name (end)
+    \paragraph{} % (fold)
+    \label{par:}
+      L'initialisation des adn est completement aleatoire. Pour se faire une creer des
+      displacement de direction aleatoire et de longueur borne par 30 pixel. 
+    % paragraph  (end)
+% section Structure de donnee (end)
+
+\section{Algorithme genetique } % (fold)
+  \paragraph{} % (fold)
+  \label{par:}
+    Comme dit precedemment l'algorithme genetique gere des population de taille fixe,avec
+    des adn de taille fixe. Nous allons maintenant expose etapes par etapes sont
+    fonctionnement. Des screenshot de fonctionnement sont disponible en annexe.
+  % paragraph  (end)
+
+  \paragraph{} % (fold)
+  \label{par:}
+    Le point de depart des adn est le milieu du bord gauche et le point d'arrivee est le
+    milieu du bord droit. Le parametre (#define) GRID\_SIZE definit la taille pixel du
+    monde (il s'agit d'un carre),ici place a 840.
+  % paragraph  (end)
+
+    \subsubsection{Evaluation} % (fold)
+    \label{ssub:Evaluation}
+      \paragraph{} % (fold)
+      \label{par:}
+      La fonction d'evaluation est la piece centrale du bon fonctionnement de l'algorithme.
+      Ici,elle selon certain parametres crucial: nombre de collision, sortie du "monde",
+      distance restante entre la fin de chaque adn et l'arrivee.\\
+      Nous ne prenons pas en compte la longueur de l'adn pour l'instant pour evite de
+      surcharge l'algorithme d'information, met le systeme est en place pour gerer la
+      longueurs.
+      % paragraph  (end)
+      \paragraph{} % (fold)
+      \label{par:}
+      Les valeurs numerique pour l'evaluation sont : pas de collision +100, -50 par
+      collision,100-distance entre l'arrive est le dernier point. Donc l'evaluation
+      maxiaml est de 200 dans le cas d'un individu qui ne rencontre pas d'obstacles et qui
+      arrive a la fin.
+      % paragraph  (end)
+    % subsubsection Evaluation (end)
+
+    \subsubsection{Selection} % (fold)
+    \label{ssub:Selection}
+      \paragraph{} % (fold)
+      \label{par:}
+        il s'agit d'une fonction relativement simple on selectionne entre 2 population(les
+        meilleurs de la generation precedente,et leurs fils que l'on vient de creer) les
+        meilleurs adn (meilleurs note) a l'aide d'un quicksort.
+      % paragraph  (end)
+    % subsubsection Selection (end)
+    
+    \subsubsection{Crossing-over} % (fold)
+    \label{ssub:Crossing-over}
+     \paragraph{} % (fold)
+     \label{par:}
+        On utilise une fonction de crossing-over (reproduction) qui se rapproche de la
+        nature. On prend du materiel genetique (ici des displacement) des deux parents
+        pour creer le fils. Dans la pratique, mieux vaut prendre plus de materiel au
+        meilleurs des deux parent, ce aui est implemente (on prend \%60 du meilleurs).
+     % paragraph  (end)
+    % subsubsection Crossing-over (end)
+
+    \subsubsection{Mutation} % (fold)
+    \label{ssub:Mutation}
+      \paragraph{} % (fold)
+      \label{par:}
+        Chaque adn nouvellement creer peut iavoir des displcement qui mute en un autre a
+        hauteurs de 1\%.
+      % paragraph  (end)
+    % subsubsection Mutation (end)
+% section Algorithme genetique (end)
+
+\section{Partie distribue} % (fold)
+\label{sec:Partie distribue}
+  \paragraph{} % (fold)
+  \label{par:}
+    La distribution est deploye comme suit: le client centrale envoie la matrix du monde a
+    tout les serveurs, puis demande a tout les serveur de lancer leurs calcul de genetique.
+    Chaque serveur envoyent ses meilleurs individus calcules en local. Le client
+    selectionne alors a travers tout les meilleurs local de chaque serveur les meilleurs
+    global et les renvoye a tous les serveurs pour qu'ils les incorpore a toutes les
+    sous-population qu'ils gereent.
+
+  % paragraph  (end)
+% section Partie distribue (end)
+
+\section{Parallelisme} % (fold)
+\label{sec:Parallelisme}
+  \paragraph{} % (fold)
+  \label{par:}
+    Chaque serveur lance dans des threads l'algorithme de recherche sur n
+    sous\_population, et a la meme maniere que pour la distribution les meilleurs individu
+    de chaque sous-population sont selectionnes et reinjectes dans toutes les
+    sous-populations.
+  
+  % paragraph  (end)
+% section Parallelisme (end)
+
+\section{Partie graphique} % (fold)
+\label{sec:Partie graphique}
+
+  \subsubsection{Choix de la librairie} % (fold)
+  \label{ssub:Choix de la librairie}
+    \paragraph{} % (fold)
+    \label{par:}
+      Nous avons choisi de réaliser d'implémenter l'affichage à l'aide la
+      librairie SDL à cause de sa simplicité qui nous a semblé suffisante pour
+      le projet.
+      Toutefois, nous avons rencontré de légères difficultés quant à
+      l'implémentation, la librairie ne disposant pas d'une fonction putpixel,
+      il a fallu la recoder.
+    % paragraph  (end)
+
+  % subsubsection Choix de la librairie (end)
+
+  \subsubsection{Adaptation a l'algorithme genetique} % (fold)
+  \label{ssub:Adaptation a l'algorithme genetique}
+    \paragraph{} % (fold)
+    \label{par:}
+      Une fonction displayi\_world crée une représentation du monde et des cercles
+      en les mappant directement sur les pixels.
+      Une autre fonction display\_adn affiche le meilleur adn parmi tous les
+      adns en bleu.
+    % paragraph  (end)
+
+  % subsubsection Adaptation a l'algorithme genetique (end)
+
+
+  \subsubsection{Amelioration possible} % (fold)
+  \label{ssub:Amelioration possible}
+    \paragraph{} % (fold)
+    \label{par:}
+      Une idée intéressante aurait été d'afficher les premiers chemins retenues
+      avec une couleur différente et de teinter les aretes des chemins selon
+      leur proximité avec le point d'arrivée.
+    % paragraph  (end)
+  % subsubsection Amelioration possible (end)
+% section Partie graphique (end)
+
+
+\section{Remarque et amelioration possible} % (fold)
+\label{sec:Remarque et amelioration possible}
+
+% section Remarque et amelioration possible (end)
+
+        Différentes remarques par rapport à l'algorithme génétique.
+        
+        \paragraph{} % (fold)
+        \label{par:}
+        
+        -1./ La fonction d'évaluation dépend de différents paramètres pour
+        fonctionner les malus et les bonus relatifs aux adns sont dépendants des
+        parmètres utilisés pour créer le monde. Par conséquent, il pourrait être
+        intéressant de calculer les bonus et les malus depuis les paramètres
+        utilisés pour créer le monde.
+        % paragraph  (end)
+        
+        \paragraph{} % (fold)
+        \label{par:}
+        
+        -2./ Il existe un problème inhérent à l'utilisation de paramètres pour la
+        fonction d'évaluation de l'algorithme génétique. L'efficacité est liée à
+        l'utilisation des paramètres, des paramètres mal choisis rendent la
+        fonction parfaitement inefficace. Ainsi, la fonction avec un trop fort
+        malus tend à créer des "pelotes de laines" et rester bloquée dans une
+        zone sans collision. En réduisant trop le malus aux collisions, on
+        obtient des collisions des collisions dans la version finale.
+        Une amélioration éventuelle consisterait à générer dynamiquement les
+        paramètres de malus:\\
+                -en tenant compte du monde (diametre des cercles, nombre de
+                cercles,densité...)\\
+                -en utilisant l'algorithme génétique pour choisir une valeur minimale des bonus/malus tel que l'on puisse générer en un
+                cycle des adns sans
+                collisions.
+
+
+        % paragraph  (end)
+
+
+\section{Repartition des tache} % (fold)
+\label{sec:Repartiotion des tache}
+Joseph s'est occuper de la partie genetique,distribue et parallelisme.\\
+Simon de la partie affichage graphique,creation du monde et divers bugs.
+% section Repartiotion des tache (end)
+
+
+\end{document}
+\end{article}
