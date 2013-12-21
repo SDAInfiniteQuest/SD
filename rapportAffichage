@@ -1,0 +1,49 @@
+	PARTIE GRAPHIQUE
+
+-Choix de la librairie.
+
+Nous avons choisi de réaliser d'implémenter l'affichage à l'aide la
+librairie SDL à cause de sa simplicité qui nous a semblé suffisante pour
+le projet.
+Toutefois, nous avons rencontré de légères difficultés quant à
+l'implémentation, la librairie ne disposant pas d'une fonction putpixel,
+il a fallu la recoder. 
+
+-Adaptation à l'algorithme génétique.
+
+Une fonction display_world crée une représentation du monde et des cercles
+en les mappant directement sur les pixels.
+Une autre fonction display_adn affiche le meilleur adn parmi tous les
+adns en bleu.
+
+-Amélioration possible:
+
+Une idée intéressante aurait été d'afficher les premiers chemins retenues
+avec une couleur différente et de teinter les aretes des chemins selon
+leur proximité avec le point d'arrivée.
+
+
+	PARTIE ALGORITHME GENETIQUE
+
+Différentes remarques par rapport à l'algorithme génétique. 
+
+-1./ La fonction d'évaluation dépend de différents paramètres pour
+fonctionner les malus et les bonus relatifs aux adns sont dépendants des
+parmètres utilisés pour créer le monde. Par conséquent, il pourrait être
+intéressant de calculer les bonus et les malus depuis les paramètres
+utilisés pour créer le monde.
+
+-2./ Il existe un problème inhérent à l'utilisation de paramètres pour la 
+fonction d'évaluation de l'algorithme génétique. L'efficacité est liée à
+l'utilisation des paramètres, des paramètres mal choisis rendent la
+fonction parfaitement inefficace. Ainsi, la fonction avec un trop fort
+malus tend à créer des "pelotes de laines" et rester bloquée dans une
+zone sans collision. En réduisant trop le malus aux collisions, on
+obtient des collisions des collisions dans la version finale.
+Une amélioration éventuelle consisterait à générer dynamiquement les
+paramètres de malus:
+	-en tenant compte du monde (diametre des cercles, nombre de cercles, 
+	densité...),
+	-en utilisant l'algorithme génétique pour choisir une valeur minimale
+	des bonus/malus tel que l'on puisse générer en un cycle des adns sans
+	collisions.
